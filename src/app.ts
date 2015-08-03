@@ -1,3 +1,3 @@
 /// <reference path="../typings/tsd.d.ts" />
 
-var app = angular.module('4screens.liveevent', []);
+var app = angular.module('4screens.liveevent', ['LocalStorageModule']);

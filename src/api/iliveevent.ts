@@ -6,9 +6,11 @@ module API {
     quizzes: string[];
 
     status: {
-      activeQuestionId: string;
-      activeQuizId: string;
       isActive: boolean;
+      activePage: Page.IPage;
+      activeQuiz: Engageform.IEngageform;
+      activePageId: string;
+      activeQuizId: string;
     }
   }
 
@@ -20,6 +22,6 @@ module API {
   export interface ILiveEmbed {
     id: string;
     socket: () => {};
-    engageform: {};
+    engageform: Engageform.IEngageform;
   }
 }

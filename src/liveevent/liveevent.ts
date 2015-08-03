@@ -1,93 +1,97 @@
 /// <reference path="iliveevent.ts" />
-
 module Liveevent {
   export class Liveevent implements ILiveevent {
     enabled: boolean;
     title: string;
+
     activePage: Page.IPage;
-    activeQuiz: Page.IPage;
+    activeQuiz: Engageform.IEngageform;
     activePageId: string;
     activeQuizId: string;
+    socket: {};
+    EF: Engageform.IEngageform;
 
-    // FIXME: Init sockets here
-    constructor(opts: API.ILiveEmbed) {
-      console.log('LE constructor');
-    }
-
-    static updatePage(page) {
-      console.log('> > Update Page');
-      console.log(page);
+    private updatePage(page) {
+      console.log('> > Update Page: ' + page._id);
       this.activePage = page;
       this.activePageId = page._id;
 
-      if (this._engageform && this.activePage) {
-        this._engageform.initPage(this.activePage);
-      }
+      this.EF._engageform.initPage(page);
+      console.log(this.EF._engageform.setCurrent);
     }
 
-    static updateQuiz(quiz) {
-      console.log('> > Update Quiz');
-      this.activeQuiz = quiz;
-      this.activeQuizId = quiz._id;
-      this._engageform = new Engageform.Live(this.activeQuiz);
-
-      if (this._engageform && this.activePage) {
-        this._engageform.initPage(this.activePage);
-      }
-
-      return this._engageform;
+    private updateQuiz(EF) {
+      console.log('> > Update Quiz: ' + EF._engageformId);
+      this.activeQuiz = EF;
+      this.activeQuizId = EF._engageformId;
     }
 
-    static connectToSocket(opts: API.ILiveEmbed) {
-      console.log('> > Init socket');
-      var url = Bootstrap.config.backend.domain + Bootstrap.config.liveEvent.socketNamespace, _self = this;
+    // Sockets
+    private initSocket(opts: API.ILiveEmbed) {
+      console.log('> Init socket');
+      var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace, _self = this;
       url = url.replace(':liveEventId', opts.id);
       _self.socket = opts.io(url);
 
       _self.socket.on('connect', () => {
+        console.log('[ Socket ] Connected');
         _self.socket.emit('getStatus', { liveEventId: opts.id });
       });
 
       _self.socket.on('liveEventStatus', (data) => {
-        if (data.activeQuestionId !== _self.activePageId) {
-          _self.getPageById(data.activeQuestionId).then((page) => {
-            _self.updatePage(page);
-          });
-        }
+          console.log(data);
+        if (data.activeQuestionId !== _self.activePageId || data.activeQuizId !== _self.activeQuizId) {
+          // Quiz changed
+          if (data.activeQuizId !== _self.activeQuizId) {
+            console.log('[ Socket ] Quiz changed');
+            // return Engageform.Engageform.getById(data.activeQuizId).then((quizData) => {
+            //   _self.updateQuiz(quizData);
+            // });
 
-        if (data.activeQuizId !== _self.activeQuizId) {
-          Engageform.Engageform.getById(data.activeQuizId).then((quizData) => {
-            _self.updateQuiz(quizData);
-          });
+            _self.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
+              _self.updateQuiz(res);
+              console.log('> > > LE get Quiz');
+              // Update Page
+              _self.getPageById(data.activeQuestionId).then((page) => {
+                _self.updatePage(page);
+              });
+            });
+          } else {
+            // Only Page changed
+            console.log('[ Socket ] Only Page changed');
+            _self.getPageById(data.activeQuestionId).then((page) => {
+              _self.updatePage(page);
+            });
+          }
         }
       });
     }
 
-    static getById(id: string): ng.IPromise<API.ILiveevent> {
-      console.log('> > LE getById');
-      var url = Bootstrap.config.backend.domain + Bootstrap.config.liveEvent.liveEventUrl;
+    // Get Liveevent
+    getById(id: string): ng.IPromise<API.ILiveevent> {
+      var url = Extension.config.backend.domain + Extension.config.liveEvent.liveEventUrl;
       url = url.replace(':liveEventId', id);
 
       // TODO: Get quiz and current question
-      return Bootstrap.$http.get(url).then((res: API.ILiveeventResponse) => {
+      return Extension.$http.get(url).then((res: API.ILiveeventResponse) => {
         if ([200, 304].indexOf(res.status) !== -1) {
-          console.log(res.data);
+          console.log('> > LE get LE: ' + res.data._id);
           return res.data;
         }
 
-        return Bootstrap.$q.reject(res);
+        return Extension.$q.reject(res);
       });
     }
 
-    static getPageById(questionId: string): ng.IPromise<API.IQuizQuestion> {
-      console.log('> > LE getPageById');
-      var url = Bootstrap.config.backend.domain + Bootstrap.config.liveEvent.activeQuestion;
+    // Get Page
+    private getPageById(questionId: string) {
+      var url = Extension.config.backend.domain + Extension.config.liveEvent.activeQuestion;
       url = url.replace(':questionId', questionId);
 
-      return Bootstrap.$http.get(url).then(function(res) {
+      return Extension.$http.get(url).then(function(res) {
 
         if ([200, 304].indexOf(res.status) !== -1) {
-          console.log(res.data);
+          console.log('> > LE get PAGE: ' + res.data._id);
           return res.data;
         }
 
@@ -95,33 +99,12 @@ module Liveevent {
       });
     }
 
-    static init(opts: API.ILiveEmbed): ng.IPromise<Engageform.IEngageform> {
+    init(opts: API.ILiveEmbed) {
       console.log('> Init: ' + opts.id);
+      this.EF = opts.engageform;
 
-      // Get socket
-      return this.connectToSocket(opts);
-
-      // Get Liveevent
-      // return this.getById(opts.id).then((liveeventData) => {
-        // _self.enabled = liveeventData.isActive || false;
-
-        // FIXME: REMOVE FAKE QUIZID
-        // _self.activeQuizId = liveeventData.activeQuizId || '55a92a97b596220100fb090c';
-
-        // FIXME: REMOVE FAKE PAGEID
-        // _self.activePageId = liveeventData.activePageId || '55a92a9ab596220100fb090d';
-
-        // Get Quiz
-        // return Engageform.Engageform.getById(_self.activeQuizId).then((quizData) => {
-        //   _self.updateQuiz(quizData);
-
-        //   // Get Question
-        //   // FIXME: MOVEIT to engagenow - /engageform/type/live.ts ?
-        //   _self.getPageById(_self.activePageId).then((page) => {
-        //     _self.updatePage(page);
-        //   });
-        // });
-      // });
+      // Init socket
+      this.initSocket(opts);
     }
   }
 }

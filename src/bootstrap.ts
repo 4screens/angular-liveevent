@@ -1,26 +1,24 @@
 /// <reference path="api/api.ts" />
 /// <reference path="liveevent/liveevent.ts" />
 
-class Extension extends Bootstrap {
+class Extension {
+  static $http: ng.IHttpService;
+  static $q: ng.IQService;
+  static localStorage: ng.local.storage.ILocalStorageService;
+  static config;
+
+  constructor($http: ng.IHttpService, $q: ng.IQService, localStorage: ng.local.storage.ILocalStorageService, ApiConfig) {
+    Extension.$http = $http;
+    Extension.$q = $q;
+    Extension.localStorage = localStorage;
+    Extension.config = ApiConfig;
+  }
 
   init(opts: API.ILiveEmbed) {
-    if (!opts || !opts.id) {
-      return Bootstrap.$q.reject({
-        status: 'error',
-        error: {
-          code: 406,
-          message: 'The required id property does not exist.'
-        },
-        data: opts
-      });
-    }
-
-    Liveevent.Liveevent.init(opts).then((res) => {
-      console.info(res);
-      return res;
-    });
+    var LE = new Liveevent.Liveevent;
+    LE.init(opts);
   }
 
 }
-
+Extension.$inject = ['$http', '$q', 'localStorageService', 'ApiConfig'];
 app.service('Liveevent', Extension);

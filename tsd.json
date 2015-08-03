@@ -22,6 +22,9 @@
     },
     "jasmine-jquery/jasmine-jquery.d.ts": {
       "commit": "c7b1128cc9a8f5797bade826e7632b36b06a856c"
+    },
+    "socket.io-client/socket.io-client.d.ts": {
+      "commit": "823be1258e4f4e286c48a7cd1383cfeb90c8f4be"
     }
   }
 }

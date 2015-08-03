@@ -3,8 +3,10 @@ module Liveevent {
     enabled: boolean;
     title: string;
     activePage: Page.IPage;
-    activeQuiz: Page.IEngageform;
+    activeQuiz: Engageform.IEngageform;
     activePageId: string;
     activeQuizId: string;
+    socket: {};
+    EF: Engageform.IEngageform;
   }
 }
