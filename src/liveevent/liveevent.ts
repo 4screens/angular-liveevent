@@ -1,4 +1,5 @@
 /// <reference path="iliveevent.ts" />
+
 module Liveevent {
   export class Liveevent implements ILiveevent {
     enabled: boolean;
@@ -12,16 +13,14 @@ module Liveevent {
     EF: Engageform.IEngageform;
 
     private updatePage(page) {
-      console.log('> > Update Page: ' + page._id);
+      console.log('> > > Update Page: ' + page._id);
       this.activePage = page;
       this.activePageId = page._id;
-
       this.EF._engageform.initPage(page);
-      console.log(this.EF._engageform.setCurrent);
     }
 
     private updateQuiz(EF) {
-      console.log('> > Update Quiz: ' + EF._engageformId);
+      console.log('> > > Update Quiz: ' + EF._engageformId);
       this.activeQuiz = EF;
       this.activeQuizId = EF._engageformId;
     }
@@ -39,7 +38,9 @@ module Liveevent {
       });
 
       _self.socket.on('liveEventStatus', (data) => {
-          console.log(data);
+        // FIXME: Remove fake chat data
+        // _self.chat = new Chat('54c73d706abb690100969887');
+
         if (data.activeQuestionId !== _self.activePageId || data.activeQuizId !== _self.activeQuizId) {
           // Quiz changed
           if (data.activeQuizId !== _self.activeQuizId) {
@@ -50,7 +51,7 @@ module Liveevent {
 
             _self.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
               _self.updateQuiz(res);
-              console.log('> > > LE get Quiz');
+              console.log('> > LE get Quiz');
               // Update Page
               _self.getPageById(data.activeQuestionId).then((page) => {
                 _self.updatePage(page);

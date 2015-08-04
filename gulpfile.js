@@ -22,8 +22,7 @@ var FILES = [
 
   path.join('.', PATH.source, 'liveevent', 'liveevent.ts'),
 
-  path.join('.', PATH.source, 'page', 'type', 'buzzer.ts'),
-  path.join('.', PATH.source, 'page', 'type', 'poster.ts'),
+  path.join('.', PATH.source, 'chat', 'chat.ts')
 ];
 
 var BANNER = path.join('.', PATH.source, 'header.txt');

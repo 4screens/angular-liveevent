@@ -1,5 +1,6 @@
 /// <reference path="api/api.ts" />
 /// <reference path="liveevent/liveevent.ts" />
+/// <reference path="chat/chat.ts" />
 
 class Extension {
   static $http: ng.IHttpService;
