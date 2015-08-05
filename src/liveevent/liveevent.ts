@@ -11,47 +11,54 @@ module Liveevent {
     activeQuizId: string;
     socket: {};
     EF: Engageform.IEngageform;
+    messages: IMessage[];
 
     private updatePage(page) {
-      console.log('> > > Update Page: ' + page._id);
+      console.log('[ Liveevent ] Update Page: ' + page._id);
       this.activePage = page;
       this.activePageId = page._id;
       this.EF._engageform.initPage(page);
     }
 
     private updateQuiz(EF) {
-      console.log('> > > Update Quiz: ' + EF._engageformId);
+      console.log('[ Liveevent ] Update Quiz: ' + EF._engageformId);
       this.activeQuiz = EF;
       this.activeQuizId = EF._engageformId;
     }
 
     // Sockets
     private initSocket(opts: API.ILiveEmbed) {
-      console.log('> Init socket');
+      console.log('[ Liveevent ] Init socket');
       var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace, _self = this;
       url = url.replace(':liveEventId', opts.id);
       _self.socket = opts.io(url);
 
       _self.socket.on('connect', () => {
-        console.log('[ Socket ] Connected');
+        console.log('[ Liveevent:Socket ] Connected');
         _self.socket.emit('getStatus', { liveEventId: opts.id });
       });
 
       _self.socket.on('liveEventStatus', (data) => {
-        // FIXME: Remove fake chat data
-        // _self.chat = new Chat('54c73d706abb690100969887');
+
+        // Init chat if Liveevent has one
+        // FIXME: Uncomment chatId checking
+        if (!_self.chat /*&& data.chatId*/) {
+          // FIXE: Remove fake chat id #55c1f03de5498601002e0c9e and get rid of socketio injection
+          // _self.chat = new Chat.Chat(data.chatId);
+          _self.chat = new Chat.Chat('54c73d706abb690100969887', opts.io);
+          _self.chat.init();
+        }
 
         if (data.activeQuestionId !== _self.activePageId || data.activeQuizId !== _self.activeQuizId) {
           // Quiz changed
           if (data.activeQuizId !== _self.activeQuizId) {
-            console.log('[ Socket ] Quiz changed');
+            console.log('[ Liveevent:Socket ] Quiz changed');
             // return Engageform.Engageform.getById(data.activeQuizId).then((quizData) => {
             //   _self.updateQuiz(quizData);
             // });
 
             _self.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
               _self.updateQuiz(res);
-              console.log('> > LE get Quiz');
               // Update Page
               _self.getPageById(data.activeQuestionId).then((page) => {
                 _self.updatePage(page);
@@ -59,7 +66,7 @@ module Liveevent {
             });
           } else {
             // Only Page changed
-            console.log('[ Socket ] Only Page changed');
+            console.log('[ Liveevent:Socket ] Only Page changed');
             _self.getPageById(data.activeQuestionId).then((page) => {
               _self.updatePage(page);
             });
@@ -76,7 +83,7 @@ module Liveevent {
       // TODO: Get quiz and current question
       return Extension.$http.get(url).then((res: API.ILiveeventResponse) => {
         if ([200, 304].indexOf(res.status) !== -1) {
-          console.log('> > LE get LE: ' + res.data._id);
+          console.log('[ Liveevent ] Get LE: ' + res.data._id);
           return res.data;
         }
 
@@ -92,7 +99,7 @@ module Liveevent {
       return Extension.$http.get(url).then(function(res) {
 
         if ([200, 304].indexOf(res.status) !== -1) {
-          console.log('> > LE get PAGE: ' + res.data._id);
+          console.log('[ Liveevent ] Get PAGE: ' + res.data._id);
           return res.data;
         }
 
@@ -101,7 +108,7 @@ module Liveevent {
     }
 
     init(opts: API.ILiveEmbed) {
-      console.log('> Init: ' + opts.id);
+      console.log('[ Liveevent ] Init: ' + opts.id);
       this.EF = opts.engageform;
 
       // Init socket
