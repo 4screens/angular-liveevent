@@ -11,7 +11,11 @@ module Liveevent {
     activeQuizId: string;
     socket: {};
     EF: Engageform.IEngageform;
-    messages: IMessage[];
+    chat: Chat.IChat;
+
+    constructor() {
+      console.log('[ Liveevent ] Constructor');
+    }
 
     private updatePage(page) {
       console.log('[ Liveevent ] Update Page: ' + page._id);
@@ -31,7 +35,7 @@ module Liveevent {
       console.log('[ Liveevent ] Init socket');
       var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace, _self = this;
       url = url.replace(':liveEventId', opts.id);
-      _self.socket = opts.io(url);
+      _self.socket = Extension.io(url);
 
       _self.socket.on('connect', () => {
         console.log('[ Liveevent:Socket ] Connected');
@@ -45,7 +49,7 @@ module Liveevent {
         if (!_self.chat /*&& data.chatId*/) {
           // FIXE: Remove fake chat id #55c1f03de5498601002e0c9e and get rid of socketio injection
           // _self.chat = new Chat.Chat(data.chatId);
-          _self.chat = new Chat.Chat('54c73d706abb690100969887', opts.io);
+          _self.chat = new Chat.Chat('54c73d706abb690100969887');
           _self.chat.init();
         }
 
@@ -99,7 +103,7 @@ module Liveevent {
       return Extension.$http.get(url).then(function(res) {
 
         if ([200, 304].indexOf(res.status) !== -1) {
-          console.log('[ Liveevent ] Get PAGE: ' + res.data._id);
+          console.log('[ Liveevent ] Get PAGE: ' + res.data['_id']);
           return res.data;
         }
 

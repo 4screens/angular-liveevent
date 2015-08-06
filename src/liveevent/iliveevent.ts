@@ -11,5 +11,6 @@ module Liveevent {
       chat: {};
     };
     EF: Engageform.IEngageform;
+    chat: Chat.IChat;
   }
 }
