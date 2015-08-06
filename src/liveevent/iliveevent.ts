@@ -8,7 +8,7 @@ module Liveevent {
     activeQuizId: string;
     socket: {};
     EF?: Engageform.IEngageform;
-    chat: Chat.IChat;
+    chat: ChatModule.IChat;
 
     init(opts: API.ILiveEmbed): void;
   }

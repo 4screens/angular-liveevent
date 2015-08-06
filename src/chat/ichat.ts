@@ -1,10 +1,10 @@
-module Chat {
+module ChatModule {
   export interface IChat {
     id: string;
     name: string;
     premoderated: boolean;
-    socket?: {};
-    messages?: Chat.IMessage[];
+    socket?: SocketIOClient.Socket;
+    messages?: IMessage[];
 
     init(): void;
   }

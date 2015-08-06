@@ -9,9 +9,9 @@ module Liveevent {
     activeQuiz: Engageform.IEngageform;
     activePageId: string;
     activeQuizId: string;
-    socket: {};
+    socket: SocketIOClient.Socket;
     EF: Engageform.IEngageform;
-    chat: Chat.IChat;
+    chat: ChatModule.IChat;
 
     constructor() {
       console.log('[ Liveevent ] Constructor');
@@ -34,48 +34,48 @@ module Liveevent {
     // Sockets
     private initSocket(opts: API.ILiveEmbed) {
       console.log('[ Liveevent ] Init socket');
-      var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace, _self = this;
+      var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace;
       url = url.replace(':liveEventId', opts.id);
-      _self.socket = <SocketIOClientStatic>Extension.io(url);
+      this.socket = Extension.io(url);
 
-      _self.socket.on('connect', () => {
+      this.socket.on('connect', () => {
         console.log('[ Liveevent:Socket ] Connected');
-        _self.socket.emit('getStatus', { liveEventId: opts.id });
+        this.socket.emit('getStatus', { liveEventId: opts.id });
       });
 
-      _self.socket.on('disconnect', _self.initSocket);
+      this.socket.on('disconnect', this.initSocket);
 
-      _self.socket.on('liveEventStatus', (data) => {
+      this.socket.on('liveEventStatus', (data) => {
 
         // Init chat if Liveevent has one
         // FIXME: Uncomment chatId checking
-        if (!_self.chat /*&& data.chatId*/) {
+        if (!this.chat /*&& data.chatId*/) {
           // FIXE: Remove fake chat id #55c1f03de5498601002e0c9e and get rid of socketio injection
-          // _self.chat = new Chat.Chat(data.chatId);
-          _self.chat = new Chat.Chat('54c73d706abb690100969887');
-          _self.chat.init();
+          // this.chat = new ChatModule.ChatModule(data.chatId);
+          this.chat = new ChatModule.Chat('54c73d706abb690100969887');
+          this.chat.init();
         }
 
-        if (data.activeQuestionId !== _self.activePageId || data.activeQuizId !== _self.activeQuizId) {
+        if (data.activeQuestionId !== this.activePageId || data.activeQuizId !== this.activeQuizId) {
           // Quiz changed
-          if (data.activeQuizId !== _self.activeQuizId) {
+          if (data.activeQuizId !== this.activeQuizId) {
             console.log('[ Liveevent:Socket ] Quiz changed');
             // return Engageform.Engageform.getById(data.activeQuizId).then((quizData) => {
-            //   _self.updateQuiz(quizData);
+            //   this.updateQuiz(quizData);
             // });
 
-            _self.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
-              _self.updateQuiz(res);
+            this.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
+              this.updateQuiz(res);
               // Update Page
-              _self.getPageById(data.activeQuestionId).then((page) => {
-                _self.updatePage(page);
+              this.getPageById(data.activeQuestionId).then((page) => {
+                this.updatePage(page);
               });
             });
           } else {
             // Only Page changed
             console.log('[ Liveevent:Socket ] Only Page changed');
-            _self.getPageById(data.activeQuestionId).then((page) => {
-              _self.updatePage(page);
+            this.getPageById(data.activeQuestionId).then((page) => {
+              this.updatePage(page);
             });
           }
         }

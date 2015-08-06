@@ -1,12 +1,12 @@
 /// <reference path="ichat.ts" />
 
-module Chat {
+module ChatModule {
   export class Chat implements IChat {
     id: string;
     name: string;
     premoderated: boolean;
-    socket: {} = {};
-    messages: Chat.IMessage[] = [];
+    socket: SocketIOClient.Socket;
+    messages: IMessage[] = [];
     user: IUser;
 
     constructor(id: string) {
@@ -70,8 +70,8 @@ module Chat {
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
         console.log(res);
-        console.log('[ Chat ] Got ' + res.data.length + ' msgs');
-        this.messages = res.data;
+        //console.log('[ Chat ] Got ' + res.data.length + ' msgs');
+        this.messages = <IMessage[]>res.data;
       });
     }
 
@@ -79,27 +79,27 @@ module Chat {
       console.log('[ Chat:Socket ] Init socket');
 
       // var url = Extension.config.backend.domain + Extension.config.chat.socketNamespace, _self = this;
-      var url = Extension.config.backend.socket, _self = this;
+      var url = Extension.config.backend.socket;
       // url = url.replace(':chatId', this.id);
 
-      _self.socket = Extension.io.connect(url);
+      this.socket = Extension.io.connect(url);
 
-      _self.socket.on('connect', (data) => {
+      this.socket.on('connect', (data) => {
         console.log('[ Chat:Socket ] Connected');
 
         // Join room
-        _self.socket.emit('joinRoom', _self.id);
+        this.socket.emit('joinRoom', this.id);
         // We can also leave room, to do so just emit 'leaveRoom' with roomId as param
       });
 
       // New msg event
-      _self.socket.on('msg', (data) => {
+      this.socket.on('msg', (data) => {
         console.log('[ Chat:Socket ] New msg');
         console.log(data);
       });
 
       // On disconect
-      _self.socket.on('disconnect', _self.initSocket);
+      this.socket.on('disconnect', this.initSocket);
     }
 
     init():void {
