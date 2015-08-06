@@ -7,7 +7,8 @@ class Extension {
   static $q: ng.IQService;
   static localStorage: ng.local.storage.ILocalStorageService;
   static config;
-  static io;
+  static io: SocketIOClientStatic;
+  Liveevent: Liveevent.ILiveevent;
 
   constructor($http: ng.IHttpService, $q: ng.IQService, localStorage: ng.local.storage.ILocalStorageService, ApiConfig) {
     Extension.$http = $http;
@@ -17,12 +18,12 @@ class Extension {
   }
 
   init(opts: API.ILiveEmbed) {
-    Extension.io = opts.io;
+    Extension.io = <SocketIOClientStatic>opts.io;
 
     this.Liveevent = new Liveevent.Liveevent;
     return this.Liveevent.init(opts);
   }
-
 }
+
 Extension.$inject = ['$http', '$q', 'localStorageService', 'ApiConfig'];
 app.service('Liveevent', Extension);

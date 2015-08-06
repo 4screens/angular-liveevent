@@ -30,7 +30,7 @@ module Chat {
       this.user = null;
     }
 
-    private updateChat(data: IChatResponse) {
+    private updateChat(data: IChat) {
       console.log('[ Chat ] Update chat');
       this.id = data.id;
       this.name = data.name;
@@ -52,7 +52,7 @@ module Chat {
         accessToken: this.user.accessToken,
         date: Date.now(),
         hidden: false,
-        id: this.user.userId, // It's a Userid or msg id ??
+        id: this.user.userId,
         msg: m,
         user: this.user.user,
         userLink: this.user.userLink,
@@ -60,7 +60,6 @@ module Chat {
       };
 
       Extension.$http.post(url, msg).then((res) => {
-        console.log(res);
         this.messages.push(msg);
       });
     }
@@ -102,13 +101,14 @@ module Chat {
       _self.socket.on('disconnect', _self.initSocket);
     }
 
-    init() {
+    init():void {
       console.log('[ Chat ] Init: ' + this.id);
 
       // Get chat details
       var url = Extension.config.backend.domain + Extension.config.chat.detailUrl;
       url = url.replace(':chatId', this.id);
       Extension.$http.get(url).then((res: IChatResponse) => {
+        console.log(res);
         this.updateChat(res.data);
         this.initSocket();
       });

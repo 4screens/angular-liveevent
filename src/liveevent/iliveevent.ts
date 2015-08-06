@@ -6,11 +6,10 @@ module Liveevent {
     activeQuiz: Engageform.IEngageform;
     activePageId: string;
     activeQuizId: string;
-    socket: {
-      liveevent: {};
-      chat: {};
-    };
-    EF: Engageform.IEngageform;
+    socket: {};
+    EF?: Engageform.IEngageform;
     chat: Chat.IChat;
+
+    init(opts: API.ILiveEmbed): ILiveevent;
   }
 }

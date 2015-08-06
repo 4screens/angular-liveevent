@@ -18,6 +18,7 @@ module Engageform {
     hasForms: boolean;
 
     isType(type: Type): boolean;
+    init(opts: API.IEmbed): ng.IPromise<Engageform.IEngageform>;
 
     initPages(): ng.IPromise<IEngageform>;
     setCurrent(pageId: string);

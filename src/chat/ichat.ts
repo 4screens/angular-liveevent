@@ -3,8 +3,8 @@ module Chat {
     id: string;
     name: string;
     premoderated: boolean;
-    socket: {};
-    messages: Chat.IMessage[];
+    socket?: {};
+    messages?: Chat.IMessage[];
 
     init(): void;
   }
@@ -15,11 +15,12 @@ module Chat {
       name: string;
       premoderated: boolean;
     };
+    status: number;
   }
 
   export interface IMessage {
     accessToken: string;
-    date: date;
+    date: string;
     hidden: boolean;
     id: string;
     msg: string;
@@ -39,7 +40,7 @@ module Chat {
   export interface IFbAuth {
     accessToken: string;
     expiresIn?: number;
-    signedRequest: string;
+    signedRequest?: string;
     userID: string;
   }
 }

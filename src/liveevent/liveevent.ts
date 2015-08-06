@@ -21,7 +21,8 @@ module Liveevent {
       console.log('[ Liveevent ] Update Page: ' + page._id);
       this.activePage = page;
       this.activePageId = page._id;
-      this.EF._engageform.initPage(page);
+      this.EF['_engageform'].initPage(page); // ts compiler ..
+      console.log(this.EF);
     }
 
     private updateQuiz(EF) {
@@ -35,12 +36,14 @@ module Liveevent {
       console.log('[ Liveevent ] Init socket');
       var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace, _self = this;
       url = url.replace(':liveEventId', opts.id);
-      _self.socket = Extension.io(url);
+      _self.socket = <SocketIOClientStatic>Extension.io(url);
 
       _self.socket.on('connect', () => {
         console.log('[ Liveevent:Socket ] Connected');
         _self.socket.emit('getStatus', { liveEventId: opts.id });
       });
+
+      _self.socket.on('disconnect', _self.initSocket);
 
       _self.socket.on('liveEventStatus', (data) => {
 

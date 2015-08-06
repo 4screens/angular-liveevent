@@ -21,7 +21,7 @@ module API {
 
   export interface ILiveEmbed {
     id: string;
-    socket: () => {};
     engageform: Engageform.IEngageform;
+    io: SocketIOClientStatic;
   }
 }
