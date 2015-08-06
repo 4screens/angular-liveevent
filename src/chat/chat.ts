@@ -69,7 +69,6 @@ module ChatModule {
       var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl;
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
-        console.log(res);
         //console.log('[ Chat ] Got ' + res.data.length + ' msgs');
         this.messages = <IMessage[]>res.data;
       });
@@ -78,11 +77,17 @@ module ChatModule {
     private initSocket() {
       console.log('[ Chat:Socket ] Init socket');
 
-      // var url = Extension.config.backend.domain + Extension.config.chat.socketNamespace, _self = this;
-      var url = Extension.config.backend.socket;
-      // url = url.replace(':chatId', this.id);
+      var url = Extension.config.backend.socket + Extension.config.chat.socketNamespace;
 
-      this.socket = Extension.io.connect(url);
+      // this.socket = Extension.io(url);
+      this.socket = Extension.io(url);
+
+      this.socket.on('error', (res) => {
+        console.log(res);
+      });
+
+      console.info(url);
+      console.info(this.socket);
 
       this.socket.on('connect', (data) => {
         console.log('[ Chat:Socket ] Connected');
@@ -95,7 +100,6 @@ module ChatModule {
       // New msg event
       this.socket.on('msg', (data) => {
         console.log('[ Chat:Socket ] New msg');
-        console.log(data);
       });
 
       // On disconect
@@ -109,7 +113,6 @@ module ChatModule {
       var url = Extension.config.backend.domain + Extension.config.chat.detailUrl;
       url = url.replace(':chatId', this.id);
       Extension.$http.get(url).then((res: IChatResponse) => {
-        console.log(res);
         this.updateChat(res.data);
         this.initSocket();
       });

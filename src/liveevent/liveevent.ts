@@ -22,7 +22,6 @@ module Liveevent {
       this.activePage = page;
       this.activePageId = page._id;
       this.EF['_engageform'].initPage(page); // ts compiler ..
-      console.log(this.EF);
     }
 
     private updateQuiz(EF) {
@@ -52,7 +51,7 @@ module Liveevent {
         if (!this.chat /*&& data.chatId*/) {
           // FIXE: Remove fake chat id #55c1f03de5498601002e0c9e and get rid of socketio injection
           // this.chat = new ChatModule.ChatModule(data.chatId);
-          this.chat = new ChatModule.Chat('54c73d706abb690100969887');
+          this.chat = new ChatModule.Chat('55c1f03de5498601002e0c9e');
           this.chat.init();
         }
 
