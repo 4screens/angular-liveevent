@@ -20,8 +20,8 @@ class Extension {
   init(opts: API.ILiveEmbed) {
     Extension.io = <SocketIOClientStatic>opts.io;
 
-    this.Liveevent = new Liveevent.Liveevent;
-    this.Liveevent.init(opts);
+    var liveevent = new Liveevent.Liveevent;
+    return liveevent.init(opts);
   }
 }
 

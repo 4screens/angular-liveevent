@@ -116,10 +116,15 @@ module Liveevent {
 
     init(opts: API.ILiveEmbed) {
       console.log('[ Liveevent ] Init: ' + opts.id);
+      var deferred = Extension.$q.defer();
+
       this.EF = opts.engageform;
 
       // Init socket
       this.initSocket(opts);
+
+      deferred.resolve(this);
+      return deferred.promise;
     }
   }
 }
