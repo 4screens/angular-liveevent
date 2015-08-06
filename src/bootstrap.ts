@@ -21,7 +21,7 @@ class Extension {
     Extension.io = <SocketIOClientStatic>opts.io;
 
     this.Liveevent = new Liveevent.Liveevent;
-    return this.Liveevent.init(opts);
+    this.Liveevent.init(opts);
   }
 }
 

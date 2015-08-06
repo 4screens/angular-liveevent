@@ -30,7 +30,7 @@ module Chat {
       this.user = null;
     }
 
-    private updateChat(data: IChat) {
+    private updateChat(data) {
       console.log('[ Chat ] Update chat');
       this.id = data.id;
       this.name = data.name;
@@ -69,7 +69,8 @@ module Chat {
       var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl;
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
-        console.log('[ Chat ] Got ' + res.data['length'] + ' msgs');
+        console.log(res);
+        console.log('[ Chat ] Got ' + res.data.length + ' msgs');
         this.messages = res.data;
       });
     }

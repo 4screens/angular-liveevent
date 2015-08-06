@@ -10,6 +10,6 @@ module Liveevent {
     EF?: Engageform.IEngageform;
     chat: Chat.IChat;
 
-    init(opts: API.ILiveEmbed): ILiveevent;
+    init(opts: API.ILiveEmbed): void;
   }
 }
