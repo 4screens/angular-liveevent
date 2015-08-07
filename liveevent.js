@@ -15,11 +15,36 @@ var Liveevent;
             this.EF['_engageform'].initPage(page); // ts compiler ..
             // Add liveSettings
             this.EF.current.liveSettings = page.liveSettings;
+            // Overwrite navigation
+            this.EF['_engageform'].navigation.enabled = false;
+            this.EF['_engageform'].navigation.position = 0;
+            this.EF['_engageform'].navigation.size = 1;
+            this.EF['_engageform'].navigation.hasStart = false;
+            this.EF['_engageform'].navigation.enabledStart = false;
+            this.EF['_engageform'].navigation.hasPrev = false;
+            this.EF['_engageform'].navigation.enabledPrev = false;
+            this.EF['_engageform'].navigation.hasNext = false;
+            this.EF['_engageform'].navigation.enabledNext = false;
+            this.EF['_engageform'].navigation.hasFinish = false;
+            this.EF['_engageform'].navigation.enabledFinish = false;
+            this.EF['_engageform'].navigation.distance = 0;
+            this.EF['_engageform'].navigation.prev = function ($event) { return; };
+            this.EF['_engageform'].navigation.next = function ($event, vcase) { return; };
+            this.EF['_engageform'].navigation.start = function ($event) { return; };
+            this.EF['_engageform'].navigation.finish = function ($event, vcase) { return; };
         };
         Liveevent.prototype.updateQuiz = function (EF) {
             console.log('[ Liveevent ] Update Quiz: ' + EF._engageformId);
             this.activeQuiz = EF;
             this.activeQuizId = EF._engageformId;
+        };
+        // Init chat
+        Liveevent.prototype.initChat = function (id) {
+            // Init chat
+            if (!this.chat) {
+                this.chat = new ChatModule.Chat(id);
+                this.chat.init();
+            }
         };
         // Sockets
         Liveevent.prototype.initSocket = function (opts) {
@@ -33,15 +58,10 @@ var Liveevent;
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
             });
             this.socket.on('disconnect', this.initSocket);
+            this.socket.on('error', function (res) {
+                console.warn(res);
+            });
             this.socket.on('liveEventStatus', function (data) {
-                // Init chat if Liveevent has one
-                // FIXME: Uncomment chatId checking
-                if (!_this.chat /*&& data.chatId*/) {
-                    // FIXE: Remove fake chat id #55c1f03de5498601002e0c9e and get rid of socketio injection
-                    // this.chat = new ChatModule.ChatModule(data.chatId);
-                    _this.chat = new ChatModule.Chat('55c1f03de5498601002e0c9e');
-                    _this.chat.init();
-                }
                 if (data.activeQuestionId !== _this.activePageId || data.activeQuizId !== _this.activeQuizId) {
                     // Quiz changed
                     if (data.activeQuizId !== _this.activeQuizId) {
@@ -74,7 +94,6 @@ var Liveevent;
             // TODO: Get quiz and current question
             return Extension.$http.get(url).then(function (res) {
                 if ([200, 304].indexOf(res.status) !== -1) {
-                    console.log('[ Liveevent ] Get LE: ' + res.data._id);
                     return res.data;
                 }
                 return Extension.$q.reject(res);
@@ -93,11 +112,17 @@ var Liveevent;
             });
         };
         Liveevent.prototype.init = function (opts) {
+            var _this = this;
             console.log('[ Liveevent ] Init: ' + opts.id);
             var deferred = Extension.$q.defer();
             this.EF = opts.engageform;
-            // Init socket
-            this.initSocket(opts);
+            // Get Liveevent
+            this.getById(opts.id).then(function (res) {
+                // Init socket
+                _this.initSocket(opts);
+                // Init chat
+                _this.initChat(res.chatId);
+            });
             deferred.resolve(this);
             return deferred.promise;
         };
@@ -173,10 +198,8 @@ var ChatModule;
             var url = Extension.config.backend.socket;
             this.socket = Extension.io.connect(url, { 'force new connection': true });
             this.socket.on('error', function (res) {
-                console.log(res);
+                console.warn(res);
             });
-            console.info(url);
-            console.info(this.socket);
             this.socket.on('connect', function (data) {
                 console.log('[ Chat:Socket ] Connected');
                 // Join room
