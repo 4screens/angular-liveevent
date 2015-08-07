@@ -27,25 +27,22 @@ module Liveevent {
       this.EF.current.liveSettings = <Page.ILiveSetting>page.liveSettings;
 
       // Overwrite navigation
-      this.EF['_engageform'].navigation = <Navigation.INavigation> {
-        enabled: false,
-        position: 0,
-        size: 1,
-        hasStart: false,
-        enabledStart: false,
-        hasPrev: false,
-        enabledPrev: false,
-        hasNext: false,
-        enabledNext: false,
-        hasFinish: false,
-        enabledFinish: false,
-        distance: 0,
-
-        prev: ($event) => { return; },
-        next: ($event, vcase: Page.ICase) => { return; },
-        start: ($event) => { return; },
-        finish: ($event, vcase: Page.ICase) => { return; }
-      };
+      this.EF['_engageform'].navigation.enabled = false;
+      this.EF['_engageform'].navigation.position = 0;
+      this.EF['_engageform'].navigation.size = 1;
+      this.EF['_engageform'].navigation.hasStart = false;
+      this.EF['_engageform'].navigation.enabledStart = false;
+      this.EF['_engageform'].navigation.hasPrev = false;
+      this.EF['_engageform'].navigation.enabledPrev = false;
+      this.EF['_engageform'].navigation.hasNext = false;
+      this.EF['_engageform'].navigation.enabledNext = false;
+      this.EF['_engageform'].navigation.hasFinish = false;
+      this.EF['_engageform'].navigation.enabledFinish = false;
+      this.EF['_engageform'].navigation.distance = 0;
+      this.EF['_engageform'].navigation.prev = ($event) => { return; };
+      this.EF['_engageform'].navigation.next = ($event, vcase: Page.ICase) => { return; };
+      this.EF['_engageform'].navigation.start = ($event) => { return; };
+      this.EF['_engageform'].navigation.finish = ($event, vcase: Page.ICase) => { return; };
     }
 
     private updateQuiz(EF) {
