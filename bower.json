@@ -1,0 +1,32 @@
+{
+  "name": "4screens-liveevent",
+  "version": "0.1.0",
+  "main": "liveevent.js",
+  "homepage": "https://github.com/4screens/angular-liveevent",
+  "authors": [
+    "Marcin Marzewski @datMarcinuz <marcin.marzewski@nopattern.net>"
+  ],
+  "license": {
+    "type": "proprietary",
+    "url": "https://nopattern.net/"
+  },
+  "ignore": [
+    ".*",
+    "node_modules",
+    "bower_components",
+    "src",
+    "test",
+    "LICENSE",
+    "package.json",
+    "gulpfile.js",
+    "karma.conf.js"
+  ],
+  "dependencies": {
+    "angular": "~1.4.0",
+    "angular-sanitize": "~1.4.0",
+    "angular-local-storage": "~0.2.2"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.4.0"
+  }
+}
