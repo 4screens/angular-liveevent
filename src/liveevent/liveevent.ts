@@ -38,7 +38,7 @@ module Liveevent {
       console.log('[ Liveevent ] Init socket');
       var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace;
       url = url.replace(':liveEventId', opts.id);
-      this.socket = Extension.io(url);
+      this.socket = Extension.io.connect(url);
 
       this.socket.on('connect', () => {
         console.log('[ Liveevent:Socket ] Connected');
@@ -54,6 +54,7 @@ module Liveevent {
         if (!this.chat /*&& data.chatId*/) {
           // FIXE: Remove fake chat id #55c1f03de5498601002e0c9e and get rid of socketio injection
           // this.chat = new ChatModule.ChatModule(data.chatId);
+
           this.chat = new ChatModule.Chat('55c1f03de5498601002e0c9e');
           this.chat.init();
         }

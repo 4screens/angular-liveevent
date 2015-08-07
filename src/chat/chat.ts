@@ -77,10 +77,9 @@ module ChatModule {
     private initSocket() {
       console.log('[ Chat:Socket ] Init socket');
 
-      var url = Extension.config.backend.socket + Extension.config.chat.socketNamespace;
+      var url = Extension.config.backend.socket;
 
-      // this.socket = Extension.io(url);
-      this.socket = Extension.io(url);
+      this.socket = Extension.io.connect(url, { 'force new connection': true });
 
       this.socket.on('error', (res) => {
         console.log(res);
