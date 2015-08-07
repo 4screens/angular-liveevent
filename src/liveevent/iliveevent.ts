@@ -12,4 +12,17 @@ module Liveevent {
 
     init(opts: API.ILiveEmbed): void;
   }
+
+  export interface ILiveeventResponse {
+    _id: string;
+    account: string;
+    chatId: string;
+    status: {
+      activeQuestionId: string;
+      activeQuizId: string;
+    };
+    activeQuestionId: string;
+    activeQuizId: string;
+    title: string;
+  }
 }

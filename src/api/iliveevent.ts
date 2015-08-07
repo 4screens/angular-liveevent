@@ -14,11 +14,6 @@ module API {
     }
   }
 
-  export interface ILiveeventResponse {
-    status: number;
-    data: ILiveevent;
-  }
-
   export interface ILiveEmbed {
     id: string;
     engageform: Engageform.IEngageform;

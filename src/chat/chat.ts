@@ -19,7 +19,7 @@ module ChatModule {
     private login(data: IFbAuth, dataMe: any) { // FIXME: dateMe FB interface (v2.3 or 2.2) ?
       this.user = {
         accessToken: data.accessToken,
-        user: data.userID, // FIXME: What i should pass here (in old version it was userId) ?!
+        user: data.userID,
         userLink: dataMe.link,
         userName: dataMe.name,
         userID: data.userID

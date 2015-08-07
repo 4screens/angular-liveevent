@@ -51,6 +51,16 @@ module Liveevent {
       this.activeQuizId = EF._engageformId;
     }
 
+    // Init chat
+    private initChat(id: string) {
+      // Init chat
+      if (!this.chat) {
+        this.chat = new ChatModule.Chat(id);
+
+        this.chat.init();
+      }
+    }
+
     // Sockets
     private initSocket(opts: API.ILiveEmbed) {
       console.log('[ Liveevent ] Init socket');
@@ -70,17 +80,6 @@ module Liveevent {
       });
 
       this.socket.on('liveEventStatus', (data) => {
-
-        // Init chat if Liveevent has one
-        // FIXME: Uncomment chatId checking
-        if (!this.chat /*&& data.chatId*/) {
-          // FIXE: Remove fake chat id #55c1f03de5498601002e0c9e and get rid of socketio injection
-          // this.chat = new ChatModule.ChatModule(data.chatId);
-
-          this.chat = new ChatModule.Chat('55c1f03de5498601002e0c9e');
-          this.chat.init();
-        }
-
         if (data.activeQuestionId !== this.activePageId || data.activeQuizId !== this.activeQuizId) {
           // Quiz changed
           if (data.activeQuizId !== this.activeQuizId) {
@@ -108,14 +107,13 @@ module Liveevent {
     }
 
     // Get Liveevent
-    getById(id: string): ng.IPromise<API.ILiveevent> {
+    getById(id: string): ng.IPromise<ILiveeventResponse> {
       var url = Extension.config.backend.domain + Extension.config.liveEvent.liveEventUrl;
       url = url.replace(':liveEventId', id);
 
       // TODO: Get quiz and current question
-      return Extension.$http.get(url).then((res: API.ILiveeventResponse) => {
+      return Extension.$http.get(url).then((res) => {
         if ([200, 304].indexOf(res.status) !== -1) {
-          console.log('[ Liveevent ] Get LE: ' + res.data._id);
           return res.data;
         }
 
@@ -145,8 +143,15 @@ module Liveevent {
 
       this.EF = opts.engageform;
 
-      // Init socket
-      this.initSocket(opts);
+      // Get Liveevent
+      this.getById(opts.id).then((res) => {
+
+        // Init socket
+        this.initSocket(opts);
+
+        // Init chat
+        this.initChat(res.chatId);
+      });
 
       deferred.resolve(this);
       return deferred.promise;
