@@ -6,4 +6,9 @@ module Page {
     showDescription: boolean;
     requiredAnswer: boolean;
   }
+
+  export interface ILiveSetting {
+      acceptResponses: boolean;
+      showAnswers: boolean;
+  };
 }

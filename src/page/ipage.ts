@@ -16,6 +16,7 @@ module Page {
     media: string;
     filled: boolean;
     settings: ISetting;
+    liveSettings: ILiveSetting;
     cases: ICase[];
 
     image?: string;

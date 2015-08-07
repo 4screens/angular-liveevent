@@ -22,6 +22,9 @@ module Liveevent {
       this.activePage = page;
       this.activePageId = page._id;
       this.EF['_engageform'].initPage(page); // ts compiler ..
+
+      // Add liveSettings
+      this.EF.current.liveSettings = <Page.ILiveSetting>page.liveSettings;
     }
 
     private updateQuiz(EF) {

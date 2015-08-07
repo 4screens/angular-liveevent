@@ -45,6 +45,10 @@ module API {
         description: string;
       }
     };
+    liveSettings: {
+      acceptResponses: boolean;
+      showAnswers: boolean;
+    };
     buzzerTheme: {
       imgIdleSrc: string,
       imgPressedSrc: string,
