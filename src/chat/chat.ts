@@ -82,11 +82,8 @@ module ChatModule {
       this.socket = Extension.io.connect(url, { 'force new connection': true });
 
       this.socket.on('error', (res) => {
-        console.log(res);
+        console.warn(res);
       });
-
-      console.info(url);
-      console.info(this.socket);
 
       this.socket.on('connect', (data) => {
         console.log('[ Chat:Socket ] Connected');

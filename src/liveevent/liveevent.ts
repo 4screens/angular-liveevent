@@ -25,6 +25,27 @@ module Liveevent {
 
       // Add liveSettings
       this.EF.current.liveSettings = <Page.ILiveSetting>page.liveSettings;
+
+      // Overwrite navigation
+      this.EF['_engageform'].navigation = <Navigation.INavigation> {
+        enabled: false,
+        position: 0,
+        size: 1,
+        hasStart: false,
+        enabledStart: false,
+        hasPrev: false,
+        enabledPrev: false,
+        hasNext: false,
+        enabledNext: false,
+        hasFinish: false,
+        enabledFinish: false,
+        distance: 0,
+
+        prev: ($event) => { return; },
+        next: ($event, vcase: Page.ICase) => { return; },
+        start: ($event) => { return; },
+        finish: ($event, vcase: Page.ICase) => { return; }
+      };
     }
 
     private updateQuiz(EF) {
@@ -46,6 +67,10 @@ module Liveevent {
       });
 
       this.socket.on('disconnect', this.initSocket);
+
+      this.socket.on('error', (res) => {
+        console.warn(res);
+      });
 
       this.socket.on('liveEventStatus', (data) => {
 
