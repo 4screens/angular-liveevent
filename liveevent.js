@@ -13,7 +13,6 @@ var Liveevent;
             var __type = this.activePage ? (this.activePage.type + '') : null;
             // Check if form and if so, send all inputs
             if (__type && __type.indexOf('form') > -1) {
-                console.warn(this.EF.message);
                 this.EF['_engageform'].navigation.pick();
             }
             this.activePage = page;
@@ -176,7 +175,6 @@ var ChatModule;
             this.getMsgs();
         };
         Chat.prototype.sendMsg = function (m) {
-            var _this = this;
             console.log('[ Chat ] Posting msg');
             if (!this.user)
                 return;
@@ -192,9 +190,7 @@ var ChatModule;
                 userLink: this.user.userLink,
                 userName: this.user.userName
             };
-            Extension.$http.post(url, msg).then(function (res) {
-                _this.messages.push(msg);
-            });
+            return Extension.$http.post(url, msg);
         };
         Chat.prototype.getMsgs = function () {
             var _this = this;
