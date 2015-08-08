@@ -40,19 +40,25 @@ var Liveevent;
         };
         // Init chat
         Liveevent.prototype.initChat = function (id) {
-            // Init chat
+            var deferred = Extension.$q.defer();
             if (!this.chat) {
                 this.chat = new ChatModule.Chat(id);
-                this.chat.init();
+                return this.chat.init();
+            }
+            else {
+                // If it is already initialised (meaning it's available on this instance), return a fake promise that
+                // is here just to make the API looks better.
+                deferred.resolve();
+                return deferred.promise;
             }
         };
         // Sockets
         Liveevent.prototype.initSocket = function (opts) {
             var _this = this;
             console.log('[ Liveevent ] Init socket');
-            var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace;
+            var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
             url = url.replace(':liveEventId', opts.id);
-            this.socket = Extension.io.connect(url);
+            this.socket = Extension.io.connect(url, { 'force new connection': true });
             this.socket.on('connect', function () {
                 console.log('[ Liveevent:Socket ] Connected');
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
@@ -121,9 +127,11 @@ var Liveevent;
                 // Init socket
                 _this.initSocket(opts);
                 // Init chat
-                _this.initChat(res.chatId);
+                _this.initChat(res.chatId).then(function () {
+                    // Resolve the general promise when chat will be available.
+                    deferred.resolve(_this);
+                });
             });
-            deferred.resolve(this);
             return deferred.promise;
         };
         return Liveevent;
@@ -219,9 +227,10 @@ var ChatModule;
             // Get chat details
             var url = Extension.config.backend.domain + Extension.config.chat.detailUrl;
             url = url.replace(':chatId', this.id);
-            Extension.$http.get(url).then(function (res) {
+            return Extension.$http.get(url).then(function (res) {
                 _this.updateChat(res.data);
                 _this.initSocket();
+                return res;
             });
         };
         return Chat;
