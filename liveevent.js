@@ -10,6 +10,12 @@ var Liveevent;
         }
         Liveevent.prototype.updatePage = function (page) {
             console.log('[ Liveevent ] Update Page: ' + page._id);
+            var __type = this.activePage ? (this.activePage.type + '') : null;
+            // Check if form and if so, send all inputs
+            if (__type && __type.indexOf('form') > -1) {
+                console.warn(this.EF.message);
+                this.EF['_engageform'].navigation.pick();
+            }
             this.activePage = page;
             this.activePageId = page._id;
             this.EF['_engageform'].initPage(page); // ts compiler ..
@@ -217,6 +223,7 @@ var ChatModule;
             // New msg event
             this.socket.on('msg', function (data) {
                 console.log('[ Chat:Socket ] New msg');
+                _this.messages.unshift(data);
             });
             // On disconect
             this.socket.on('disconnect', this.initSocket);
