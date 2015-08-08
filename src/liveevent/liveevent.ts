@@ -24,7 +24,6 @@ module Liveevent {
 
       // Check if form and if so, send all inputs
       if (__type && __type.indexOf('form') > -1) {
-        console.warn(this.EF.message);
         this.EF['_engageform'].navigation.pick();
       }
 
