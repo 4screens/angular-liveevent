@@ -59,9 +59,7 @@ module ChatModule {
         userName: this.user.userName
       };
 
-      Extension.$http.post(url, msg).then((res) => {
-        this.messages.push(msg);
-      });
+      return Extension.$http.post(url, msg);
     }
 
     private getMsgs() {
