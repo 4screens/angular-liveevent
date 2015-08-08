@@ -64,9 +64,9 @@ module Liveevent {
     // Sockets
     private initSocket(opts: API.ILiveEmbed) {
       console.log('[ Liveevent ] Init socket');
-      var url = Extension.config.backend.domain + Extension.config.liveEvent.socketNamespace;
+      var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
       url = url.replace(':liveEventId', opts.id);
-      this.socket = Extension.io.connect(url);
+      this.socket = Extension.io.connect(url, { 'force new connection': true });
 
       this.socket.on('connect', () => {
         console.log('[ Liveevent:Socket ] Connected');
