@@ -6,7 +6,7 @@ module ChatModule {
     socket?: SocketIOClient.Socket;
     messages?: IMessage[];
 
-    init(): void;
+    init(): ng.IPromise<IChatResponse>;
   }
 
   export interface IChatResponse {

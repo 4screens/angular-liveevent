@@ -62,12 +62,18 @@ module Liveevent {
     }
 
     // Init chat
-    private initChat(id: string) {
-      // Init chat
+    private initChat(id: string): ng.IPromise<any> {
+      var deferred = Extension.$q.defer();
+
       if (!this.chat) {
         this.chat = new ChatModule.Chat(id);
 
-        this.chat.init();
+        return this.chat.init();
+      } else {
+        // If it is already initialised (meaning it's available on this instance), return a fake promise that
+        // is here just to make the API looks better.
+        deferred.resolve();
+        return deferred.promise;
       }
     }
 
@@ -161,10 +167,12 @@ module Liveevent {
         this.initSocket(opts);
 
         // Init chat
-        this.initChat(res.chatId);
+        this.initChat(res.chatId).then(() => {
+          // Resolve the general promise when chat will be available.
+          deferred.resolve(this);
+        });
       });
 
-      deferred.resolve(this);
       return deferred.promise;
     }
   }
