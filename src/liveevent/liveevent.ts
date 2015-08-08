@@ -19,6 +19,15 @@ module Liveevent {
 
     private updatePage(page) {
       console.log('[ Liveevent ] Update Page: ' + page._id);
+
+      var __type = this.activePage ? (this.activePage.type + '') : null;
+
+      // Check if form and if so, send all inputs
+      if (__type && __type.indexOf('form') > -1) {
+        console.warn(this.EF.message);
+        this.EF['_engageform'].navigation.pick();
+      }
+
       this.activePage = page;
       this.activePageId = page._id;
       this.EF['_engageform'].initPage(page); // ts compiler ..
@@ -47,6 +56,7 @@ module Liveevent {
 
     private updateQuiz(EF) {
       console.log('[ Liveevent ] Update Quiz: ' + EF._engageformId);
+
       this.activeQuiz = EF;
       this.activeQuizId = EF._engageformId;
     }
@@ -90,6 +100,7 @@ module Liveevent {
 
             this.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
               this.updateQuiz(res);
+
               // Update Page
               this.getPageById(data.activeQuestionId).then((page) => {
                 this.updatePage(page);
