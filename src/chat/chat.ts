@@ -96,6 +96,7 @@ module ChatModule {
       // New msg event
       this.socket.on('msg', (data) => {
         console.log('[ Chat:Socket ] New msg');
+        this.messages.unshift(<IMessage>data);
       });
 
       // On disconect
