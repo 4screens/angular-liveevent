@@ -102,15 +102,16 @@ module ChatModule {
       this.socket.on('disconnect', this.initSocket);
     }
 
-    init():void {
+    init():ng.IPromise<IChatResponse> {
       console.log('[ Chat ] Init: ' + this.id);
 
       // Get chat details
       var url = Extension.config.backend.domain + Extension.config.chat.detailUrl;
       url = url.replace(':chatId', this.id);
-      Extension.$http.get(url).then((res: IChatResponse) => {
+      return Extension.$http.get(url).then((res: IChatResponse) => {
         this.updateChat(res.data);
         this.initSocket();
+        return res;
       });
     }
   }
