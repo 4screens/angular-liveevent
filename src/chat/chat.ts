@@ -104,7 +104,7 @@ module ChatModule {
 
         var messageIndex = this.messages.length;
 
-        for (var i = 0; i <= this.messages.length; i += 1) {
+        for (var i = 0; i < this.messages.length; i += 1) {
           if (this.messages[i].id === id) {
             messageIndex = i;
           }
