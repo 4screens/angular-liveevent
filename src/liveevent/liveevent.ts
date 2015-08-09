@@ -120,6 +120,10 @@ module Liveevent {
           }
         }
       });
+
+      this.socket.on('multipleChoiceQuestionAnswers', (data) => {
+        this.EF.current.updateAnswers(data);
+      });
     }
 
     // Get Liveevent
