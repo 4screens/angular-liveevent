@@ -99,6 +99,22 @@ module ChatModule {
         })
       });
 
+      this.socket.on('msgHide', (id) => {
+        console.log('[ Chat:Socket] Hide msg');
+
+        var messageIndex = this.messages.length;
+
+        for (var i = 0; i <= this.messages.length; i += 1) {
+          if (this.messages[i].id === id) {
+            messageIndex = i;
+          }
+        }
+
+        Extension.$rootScope.$apply(() => {
+          this.messages.splice(messageIndex, 1);
+        });
+      });
+
       // On disconect
       this.socket.on('disconnect', this.initSocket);
     }
