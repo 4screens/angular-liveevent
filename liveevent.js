@@ -226,7 +226,7 @@ var ChatModule;
             this.socket.on('msgHide', function (id) {
                 console.log('[ Chat:Socket] Hide msg');
                 var messageIndex = _this.messages.length;
-                for (var i = 0; i <= _this.messages.length; i += 1) {
+                for (var i = 0; i < _this.messages.length; i += 1) {
                     if (_this.messages[i].id === id) {
                         messageIndex = i;
                     }
