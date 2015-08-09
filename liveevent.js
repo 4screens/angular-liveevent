@@ -97,6 +97,9 @@ var Liveevent;
                     }
                 }
             });
+            this.socket.on('multipleChoiceQuestionAnswers', function (data) {
+                _this.EF.current.updateAnswers(data);
+            });
         };
         // Get Liveevent
         Liveevent.prototype.getById = function (id) {
