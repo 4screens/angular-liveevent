@@ -219,7 +219,9 @@ var ChatModule;
             // New msg event
             this.socket.on('msg', function (data) {
                 console.log('[ Chat:Socket ] New msg');
-                _this.messages.unshift(data);
+                Extension.$rootScope.$apply(function () {
+                    _this.messages.unshift(data);
+                });
             });
             // On disconect
             this.socket.on('disconnect', this.initSocket);
@@ -245,11 +247,12 @@ var ChatModule;
 /// <reference path="liveevent/liveevent.ts" />
 /// <reference path="chat/chat.ts" />
 var Extension = (function () {
-    function Extension($http, $q, localStorage, ApiConfig) {
+    function Extension($http, $q, localStorage, $rootScope, ApiConfig) {
         Extension.$http = $http;
         Extension.$q = $q;
         Extension.localStorage = localStorage;
         Extension.config = ApiConfig;
+        Extension.$rootScope = $rootScope;
     }
     Extension.prototype.init = function (opts) {
         Extension.io = opts.io;
@@ -258,7 +261,7 @@ var Extension = (function () {
     };
     return Extension;
 })();
-Extension.$inject = ['$http', '$q', 'localStorageService', 'ApiConfig'];
+Extension.$inject = ['$http', '$q', 'localStorageService', '$rootScope', 'ApiConfig'];
 app.service('Liveevent', Extension);
 
 /// <reference path="api/iembed.ts" />
