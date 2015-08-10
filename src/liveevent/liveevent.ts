@@ -95,6 +95,7 @@ module Liveevent {
       });
 
       this.socket.on('liveEventStatus', (data) => {
+
         if (data.activeQuestionId !== this.activePageId || data.activeQuizId !== this.activeQuizId) {
           // Quiz changed
           if (data.activeQuizId !== this.activeQuizId) {
@@ -109,6 +110,8 @@ module Liveevent {
               // Update Page
               this.getPageById(data.activeQuestionId).then((page) => {
                 this.updatePage(page);
+
+
               });
             });
           } else {
@@ -118,6 +121,15 @@ module Liveevent {
               this.updatePage(page);
             });
           }
+        }
+
+        // Quiz and page is same, check if showAnswers had change
+        if (this.EF.current && data.showAnswers !== this.EF.current.liveSettings.showAnswers) {
+          console.log('[ Liveevent ] Show answer option changed');
+
+          Extension.$timeout(() => {
+            this.EF.current.liveSettings.showAnswers = !this.EF.current.liveSettings.showAnswers;
+          });
         }
       });
 
