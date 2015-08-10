@@ -96,6 +96,13 @@ var Liveevent;
                         });
                     }
                 }
+                // Quiz and page is same, check if showAnswers had change
+                if (_this.EF.current && data.showAnswers !== _this.EF.current.liveSettings.showAnswers) {
+                    console.log('[ Liveevent ] Show answer option changed');
+                    Extension.$timeout(function () {
+                        _this.EF.current.liveSettings.showAnswers = !_this.EF.current.liveSettings.showAnswers;
+                    });
+                }
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
                 _this.EF.current.updateAnswers(data);
@@ -262,8 +269,9 @@ var ChatModule;
 /// <reference path="liveevent/liveevent.ts" />
 /// <reference path="chat/chat.ts" />
 var Extension = (function () {
-    function Extension($http, $q, localStorage, $rootScope, ApiConfig) {
+    function Extension($http, $q, $timeout, localStorage, $rootScope, ApiConfig) {
         Extension.$http = $http;
+        Extension.$timeout = $timeout;
         Extension.$q = $q;
         Extension.localStorage = localStorage;
         Extension.config = ApiConfig;
@@ -276,7 +284,7 @@ var Extension = (function () {
     };
     return Extension;
 })();
-Extension.$inject = ['$http', '$q', 'localStorageService', '$rootScope', 'ApiConfig'];
+Extension.$inject = ['$http', '$q', '$timeout', 'localStorageService', '$rootScope', 'ApiConfig'];
 app.service('Liveevent', Extension);
 
 /// <reference path="api/iembed.ts" />
