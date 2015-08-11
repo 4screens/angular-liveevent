@@ -24,7 +24,7 @@ module Liveevent {
 
       // Check if form and if so, send all inputs
       if (__type && __type.indexOf('form') > -1) {
-        this.EF['_engageform'].navigation.pick();
+        this.EF['_engageform'].navigation.pick(null, null, {quiet: true});
       }
 
       this.activePage = page;
