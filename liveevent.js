@@ -13,7 +13,7 @@ var Liveevent;
             var __type = this.activePage ? (this.activePage.type + '') : null;
             // Check if form and if so, send all inputs
             if (__type && __type.indexOf('form') > -1) {
-                this.EF['_engageform'].navigation.pick();
+                this.EF['_engageform'].navigation.pick(null, null, { quiet: true });
             }
             this.activePage = page;
             this.activePageId = page._id;
