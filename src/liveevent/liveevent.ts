@@ -183,9 +183,9 @@ module Liveevent {
 
         // Init chat
         this.initChat(res.chatId).then(() => {
-          // Resolve the general promise when chat will be available.
-          deferred.resolve(this);
+          // ...
         });
+        deferred.resolve(this);
       });
 
       return deferred.promise;
