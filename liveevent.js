@@ -143,9 +143,9 @@ var Liveevent;
                 _this.initSocket(opts);
                 // Init chat
                 _this.initChat(res.chatId).then(function () {
-                    // Resolve the general promise when chat will be available.
-                    deferred.resolve(_this);
+                    // ...
                 });
+                deferred.resolve(_this);
             });
             return deferred.promise;
         };
