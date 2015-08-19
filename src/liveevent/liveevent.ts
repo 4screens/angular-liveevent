@@ -53,11 +53,43 @@ module Liveevent {
       this.EF['_engageform'].navigation.finish = ($event, vcase: Page.ICase) => { return; };
     }
 
+    private removePage() {
+      console.log('[ Liveevent ] Remove page');
+      Extension.$timeout(() => {
+        this.activePage = null;
+        this.activePageId = null;
+
+        if (this.EF['_engageform']) {
+          this.EF['_engageform'].current = null;
+          this.EF['_engageform'].message = null;
+        }
+      });
+    }
+
     private updateQuiz(EF) {
       console.log('[ Liveevent ] Update Quiz: ' + EF._engageformId);
 
       this.activeQuiz = EF;
       this.activeQuizId = EF._engageformId;
+    }
+
+    private removeQuiz() {
+      console.log('[ Liveevent ] Remove quiz');
+      Extension.$timeout(() => {
+        this.activeQuiz = null;
+        this.activeQuizId = null;
+
+        if (this.EF['_engageform']) {
+          this.EF['_engageform'].branding = null;
+          this.EF['_engageform'].current = null;
+          this.EF['_engageform'].message = null;
+          this.EF['_engageform'].meta = null;
+          this.EF['_engageform'].navigation = null;
+          this.EF['_engageform'].theme = null;
+          this.EF['_engageform'].title = null;
+          this.EF['_engageform'].type = null;
+        }
+      });
     }
 
     // Init chat
@@ -96,22 +128,43 @@ module Liveevent {
 
       this.socket.on('liveEventStatus', (data) => {
 
+        // Liveevent is off
+        if (!data.isActive) {
+          console.log('[ Liveevent:Socket ] Liveevent is not active');
+          this.removePage();
+          this.removeQuiz();
+
+          return;
+        }
+
         if (data.activeQuestionId !== this.activePageId || data.activeQuizId !== this.activeQuizId) {
+
+          // Quiz is off
+          if (!data.activeQuizId) {
+            console.log('[ Liveevent ] Quiz is empty');
+            this.removeQuiz();
+
+            return;
+          }
+
+          // Page is off
+          if (!data.activeQuestionId) {
+            console.log('[ Liveevent ] Page is empty');
+            this.removePage();
+
+            return;
+          }
+
+
           // Quiz changed
           if (data.activeQuizId !== this.activeQuizId) {
             console.log('[ Liveevent:Socket ] Quiz changed');
-            // return Engageform.Engageform.getById(data.activeQuizId).then((quizData) => {
-            //   this.updateQuiz(quizData);
-            // });
-
             this.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
               this.updateQuiz(res);
 
               // Update Page
               this.getPageById(data.activeQuestionId).then((page) => {
                 this.updatePage(page);
-
-
               });
             });
           } else {
