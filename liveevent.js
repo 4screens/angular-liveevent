@@ -38,10 +38,40 @@ var Liveevent;
             this.EF['_engageform'].navigation.start = function ($event) { return; };
             this.EF['_engageform'].navigation.finish = function ($event, vcase) { return; };
         };
+        Liveevent.prototype.removePage = function () {
+            var _this = this;
+            console.log('[ Liveevent ] Remove page');
+            Extension.$timeout(function () {
+                _this.activePage = null;
+                _this.activePageId = null;
+                if (_this.EF['_engageform']) {
+                    _this.EF['_engageform'].current = null;
+                    _this.EF['_engageform'].message = null;
+                }
+            });
+        };
         Liveevent.prototype.updateQuiz = function (EF) {
             console.log('[ Liveevent ] Update Quiz: ' + EF._engageformId);
             this.activeQuiz = EF;
             this.activeQuizId = EF._engageformId;
+        };
+        Liveevent.prototype.removeQuiz = function () {
+            var _this = this;
+            console.log('[ Liveevent ] Remove quiz');
+            Extension.$timeout(function () {
+                _this.activeQuiz = null;
+                _this.activeQuizId = null;
+                if (_this.EF['_engageform']) {
+                    _this.EF['_engageform'].branding = null;
+                    _this.EF['_engageform'].current = null;
+                    _this.EF['_engageform'].message = null;
+                    _this.EF['_engageform'].meta = null;
+                    _this.EF['_engageform'].navigation = null;
+                    _this.EF['_engageform'].theme = null;
+                    _this.EF['_engageform'].title = null;
+                    _this.EF['_engageform'].type = null;
+                }
+            });
         };
         // Init chat
         Liveevent.prototype.initChat = function (id) {
@@ -73,13 +103,29 @@ var Liveevent;
                 console.warn(res);
             });
             this.socket.on('liveEventStatus', function (data) {
+                // Liveevent is off
+                if (!data.isActive) {
+                    console.log('[ Liveevent:Socket ] Liveevent is not active');
+                    _this.removePage();
+                    _this.removeQuiz();
+                    return;
+                }
                 if (data.activeQuestionId !== _this.activePageId || data.activeQuizId !== _this.activeQuizId) {
+                    // Quiz is off
+                    if (!data.activeQuizId) {
+                        console.log('[ Liveevent ] Quiz is empty');
+                        _this.removeQuiz();
+                        return;
+                    }
+                    // Page is off
+                    if (!data.activeQuestionId) {
+                        console.log('[ Liveevent ] Page is empty');
+                        _this.removePage();
+                        return;
+                    }
                     // Quiz changed
                     if (data.activeQuizId !== _this.activeQuizId) {
                         console.log('[ Liveevent:Socket ] Quiz changed');
-                        // return Engageform.Engageform.getById(data.activeQuizId).then((quizData) => {
-                        //   this.updateQuiz(quizData);
-                        // });
                         _this.EF.init({ id: data.activeQuizId, mode: 'default' }).then(function (res) {
                             _this.updateQuiz(res);
                             // Update Page
