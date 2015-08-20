@@ -227,6 +227,8 @@ var ChatModule;
             this.id = data.id;
             this.name = data.name;
             this.premoderated = data.premoderated;
+            this.direction = data.chatDirection;
+            this.theme = data.theme;
             // Get some old msgs
             this.getMsgs();
         };
