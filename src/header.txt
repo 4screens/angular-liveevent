@@ -1,0 +1,5 @@
+/*!
+ * <%= pkg.name %> v<%= pkg.version %>
+ * (c) 2015 Nopattern sp. z o.o.
+ * License: <%= pkg.license.type %>
+ */
