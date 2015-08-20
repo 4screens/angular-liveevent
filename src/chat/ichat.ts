@@ -3,6 +3,8 @@ module ChatModule {
     id: string;
     name: string;
     premoderated: boolean;
+    direction: string;
+    theme?: ITheme;
     socket?: SocketIOClient.Socket;
     messages?: IMessage[];
 
@@ -42,5 +44,13 @@ module ChatModule {
     expiresIn?: number;
     signedRequest?: string;
     userID: string;
+  }
+
+  export interface ITheme {
+      avatar: string;
+      backgroundColor: string;
+      borderColor: string;
+      fontColor: string;
+      headerFontColor: string;
   }
 }

@@ -5,6 +5,8 @@ module ChatModule {
     id: string;
     name: string;
     premoderated: boolean;
+    direction: string;
+    theme: ITheme;
     socket: SocketIOClient.Socket;
     messages: IMessage[] = [];
     user: IUser;
@@ -35,6 +37,8 @@ module ChatModule {
       this.id = data.id;
       this.name = data.name;
       this.premoderated = data.premoderated;
+      this.direction = data.chatDirection;
+      this.theme = data.theme;
 
       // Get some old msgs
       this.getMsgs();
