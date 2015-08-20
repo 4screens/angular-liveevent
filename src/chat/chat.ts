@@ -73,6 +73,17 @@ module ChatModule {
       return Extension.$http.get(url).then((res) => {
         //console.log('[ Chat ] Got ' + res.data.length + ' msgs');
         this.messages = <IMessage[]>res.data;
+
+        if (this.messages.length) {
+          // Sort by newest
+          this.messages = _.sortBy(this.messages, 'date').reverse();
+
+          // Reverse msg order
+          if (this.direction && this.direction === 'ttb') {
+            this.messages.reverse();
+          }
+        }
+
       });
     }
 
@@ -99,7 +110,13 @@ module ChatModule {
       this.socket.on('msg', (data) => {
         console.log('[ Chat:Socket ] New msg');
         Extension.$rootScope.$apply(() => {
-          this.messages.unshift(<IMessage>data);
+
+          if (this.direction && this.direction === 'ttb') {
+            this.messages.push(<IMessage>data);
+          } else {
+            this.messages.unshift(<IMessage>data);
+          }
+
         })
       });
 

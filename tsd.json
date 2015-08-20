@@ -25,6 +25,9 @@
     },
     "socket.io-client/socket.io-client.d.ts": {
       "commit": "823be1258e4f4e286c48a7cd1383cfeb90c8f4be"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "38fb591c6eba840e0b53d1110302b8e4fb04651c"
     }
   }
 }
