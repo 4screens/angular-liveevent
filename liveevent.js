@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.14
+ * 4screens-angular-liveevent v0.1.15
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -265,6 +265,14 @@ var ChatModule;
             return Extension.$http.get(url).then(function (res) {
                 //console.log('[ Chat ] Got ' + res.data.length + ' msgs');
                 _this.messages = res.data;
+                if (_this.messages.length) {
+                    // Sort by newest
+                    _this.messages = _.sortBy(_this.messages, 'date').reverse();
+                    // Reverse msg order
+                    if (_this.direction && _this.direction === 'ttb') {
+                        _this.messages.reverse();
+                    }
+                }
             });
         };
         Chat.prototype.initSocket = function () {
@@ -285,7 +293,12 @@ var ChatModule;
             this.socket.on('msg', function (data) {
                 console.log('[ Chat:Socket ] New msg');
                 Extension.$rootScope.$apply(function () {
-                    _this.messages.unshift(data);
+                    if (_this.direction && _this.direction === 'ttb') {
+                        _this.messages.push(data);
+                    }
+                    else {
+                        _this.messages.unshift(data);
+                    }
                 });
             });
             this.socket.on('msgHide', function (id) {
