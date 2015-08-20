@@ -1,3 +1,10 @@
+(function(angular) {
+/*!
+ * 4screens-angular-liveevent v0.1.14
+ * (c) 2015 Nopattern sp. z o.o.
+ * License: proprietary
+ */
+
 /// <reference path="../typings/tsd.d.ts" />
 var app = angular.module('4screens.liveevent', ['LocalStorageModule']);
 
@@ -326,10 +333,14 @@ var Extension = (function () {
         Extension.$rootScope = $rootScope;
     }
     Extension.prototype.init = function (opts) {
+        if (Extension._instances[opts.id]) {
+            return Extension._instances[opts.id];
+        }
         Extension.io = opts.io;
-        var liveevent = new Liveevent.Liveevent;
-        return liveevent.init(opts);
+        var liveEvent = new Liveevent.Liveevent();
+        return Extension._instances[opts.id] = liveEvent.init(opts);
     };
+    Extension._instances = {};
     return Extension;
 })();
 Extension.$inject = ['$http', '$q', '$timeout', 'localStorageService', '$rootScope', 'ApiConfig'];
@@ -356,5 +367,5 @@ app.service('Liveevent', Extension);
 /// <reference path="engageform/itheme.ts" />
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
-
+})(angular);
 //# sourceMappingURL=liveevent.js.map
