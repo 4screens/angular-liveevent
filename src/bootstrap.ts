@@ -12,6 +12,8 @@ class Extension {
   static io: SocketIOClientStatic;
   Liveevent: Liveevent.ILiveevent;
 
+  private static _instances: Liveevent.ILiveeventInstances = {};
+
   constructor($http: ng.IHttpService, $q: ng.IQService, $timeout: ng.ITimeoutService, localStorage: ng.local.storage.ILocalStorageService, $rootScope: ng.IRootScopeService, ApiConfig) {
     Extension.$http = $http;
     Extension.$timeout = $timeout;
@@ -21,11 +23,15 @@ class Extension {
     Extension.$rootScope = $rootScope;
   }
 
-  init(opts: API.ILiveEmbed) {
+  init(opts: API.ILiveEmbed): ng.IPromise<Liveevent.ILiveevent> {
+    if (Extension._instances[opts.id]) {
+      return Extension._instances[opts.id];
+    }
+
     Extension.io = <SocketIOClientStatic>opts.io;
 
-    var liveevent = new Liveevent.Liveevent;
-    return liveevent.init(opts);
+    var liveEvent = new Liveevent.Liveevent();
+    return Extension._instances[opts.id] = liveEvent.init(opts);
   }
 }
 

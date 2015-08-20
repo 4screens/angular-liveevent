@@ -25,4 +25,9 @@ module Liveevent {
     activeQuizId: string;
     title: string;
   }
+
+  export interface  ILiveeventInstances {
+    [index: string]: ng.IPromise<Liveevent.ILiveevent>;
+  }
+
 }
