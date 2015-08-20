@@ -10,4 +10,5 @@ coverage
 
 # Build files... dont needed here
 /liveevent*
+/release
 /src/header.ts
