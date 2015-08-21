@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.15
+ * 4screens-angular-liveevent v0.1.16
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -14,6 +14,7 @@ var Liveevent;
     var Liveevent = (function () {
         function Liveevent() {
             console.log('[ Liveevent ] Constructor');
+            this.event = new Util.Event();
         }
         Liveevent.prototype.updatePage = function (page) {
             console.log('[ Liveevent ] Update Page: ' + page._id);
@@ -84,7 +85,7 @@ var Liveevent;
         Liveevent.prototype.initChat = function (id) {
             var deferred = Extension.$q.defer();
             if (!this.chat) {
-                this.chat = new ChatModule.Chat(id);
+                this.chat = new ChatModule.Chat(id, this);
                 return this.chat.init();
             }
             else {
@@ -189,6 +190,7 @@ var Liveevent;
             var _this = this;
             console.log('[ Liveevent ] Init: ' + opts.id);
             var deferred = Extension.$q.defer();
+            this.id = opts.id;
             this.EF = opts.engageform;
             // Get Liveevent
             this.getById(opts.id).then(function (res) {
@@ -211,11 +213,11 @@ var Liveevent;
 var ChatModule;
 (function (ChatModule) {
     var Chat = (function () {
-        function Chat(id) {
+        function Chat(id, liveevent) {
             this.messages = [];
             console.log('[ Chat ] Constructor');
             this.id = id;
-            return this;
+            this._liveevent = liveevent;
         }
         Chat.prototype.login = function (data, dataMe) {
             this.user = {
@@ -292,6 +294,7 @@ var ChatModule;
             // New msg event
             this.socket.on('msg', function (data) {
                 console.log('[ Chat:Socket ] New msg');
+                _this._liveevent.event.trigger('chat::message', _this._liveevent.id, data);
                 Extension.$rootScope.$apply(function () {
                     if (_this.direction && _this.direction === 'ttb') {
                         _this.messages.push(data);
@@ -380,5 +383,52 @@ app.service('Liveevent', Extension);
 /// <reference path="engageform/itheme.ts" />
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
+
+var Util;
+(function (Util) {
+    var Event = (function () {
+        function Event() {
+            this._listener = {};
+        }
+        /**
+         * Register callback for given event.
+         *
+         * @param {String} event
+         * @param {Function} callback
+         */
+        Event.prototype.listen = function (event, callback) {
+            console.log('[ Util:Event ] listen', event);
+            if (!this._listener[event]) {
+                this._listener[event] = [];
+            }
+            this._listener[event].push({
+                next: callback
+            });
+        };
+        /**
+         * Fire event with given arguments.
+         *
+         * @param {string} event
+         * @param {args...} data
+         */
+        Event.prototype.trigger = function (event) {
+            var data = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                data[_i - 1] = arguments[_i];
+            }
+            console.log('[ Util:Event ] trigger', event);
+            var args = Array.apply(null, arguments).slice(1);
+            var listeners = this._listener[event];
+            if (!listeners) {
+                return;
+            }
+            for (var i = 0; i < listeners.length; i++) {
+                listeners[i].next.apply(null, args);
+            }
+        };
+        return Event;
+    })();
+    Util.Event = Event;
+})(Util || (Util = {}));
 })(angular);
 //# sourceMappingURL=liveevent.js.map
