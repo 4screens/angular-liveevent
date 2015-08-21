@@ -19,6 +19,8 @@ var FILES = [
   path.join('.', PATH.source, 'bootstrap.ts'),
   path.join('.', PATH.source, 'extend.ts'),
 
+  path.join('.', PATH.source, 'util', 'event.ts'),
+
   path.join('.', PATH.source, 'liveevent', 'liveevent.ts'),
 
   path.join('.', PATH.source, 'chat', 'chat.ts')

@@ -11,11 +11,13 @@ module ChatModule {
     messages: IMessage[] = [];
     user: IUser;
 
-    constructor(id: string) {
+    private _liveevent: Liveevent.ILiveevent;
+
+    constructor(id: string, liveevent: Liveevent.ILiveevent) {
       console.log('[ Chat ] Constructor');
       this.id = id;
 
-      return this;
+      this._liveevent = liveevent;
     }
 
     private login(data: IFbAuth, dataMe: any) { // FIXME: dateMe FB interface (v2.3 or 2.2) ?
@@ -109,6 +111,8 @@ module ChatModule {
       // New msg event
       this.socket.on('msg', (data) => {
         console.log('[ Chat:Socket ] New msg');
+
+        this._liveevent.event.trigger('chat::message', this._liveevent.id, <IMessage>data);
         Extension.$rootScope.$apply(() => {
 
           if (this.direction && this.direction === 'ttb') {

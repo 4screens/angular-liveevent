@@ -1,6 +1,7 @@
 module Liveevent {
   export interface ILiveevent {
     enabled: boolean;
+    id :string;
     title: string;
     activePage: Page.IPage;
     activeQuiz: Engageform.IEngageform;
@@ -9,6 +10,7 @@ module Liveevent {
     socket: {};
     EF?: Engageform.IEngageform;
     chat: ChatModule.IChat;
+    event: Util.IEvent;
 
     init(opts: API.ILiveEmbed): void;
   }

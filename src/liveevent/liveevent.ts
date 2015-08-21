@@ -3,6 +3,7 @@
 module Liveevent {
   export class Liveevent implements ILiveevent {
     enabled: boolean;
+    id :string;
     title: string;
 
     activePage: Page.IPage;
@@ -13,8 +14,12 @@ module Liveevent {
     EF: Engageform.IEngageform;
     chat: ChatModule.IChat;
 
+    event: Util.Event;
+
     constructor() {
       console.log('[ Liveevent ] Constructor');
+
+      this.event = new Util.Event();
     }
 
     private updatePage(page) {
@@ -97,7 +102,7 @@ module Liveevent {
       var deferred = Extension.$q.defer();
 
       if (!this.chat) {
-        this.chat = new ChatModule.Chat(id);
+        this.chat = new ChatModule.Chat(id, this);
 
         return this.chat.init();
       } else {
@@ -226,6 +231,7 @@ module Liveevent {
       console.log('[ Liveevent ] Init: ' + opts.id);
       var deferred = Extension.$q.defer();
 
+      this.id = opts.id;
       this.EF = opts.engageform;
 
       // Get Liveevent
