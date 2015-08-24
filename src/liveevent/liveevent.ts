@@ -34,7 +34,9 @@ module Liveevent {
 
       this.activePage = page;
       this.activePageId = page._id;
-      this.EF['_engageform'].initPage(page); // ts compiler ..
+
+      this.EF['_engageform'].message = null;
+      this.EF['_engageform'].initPage(page);
 
       // Add liveSettings
       this.EF.current.liveSettings = <Page.ILiveSetting>page.liveSettings;
@@ -56,6 +58,18 @@ module Liveevent {
       this.EF['_engageform'].navigation.next = ($event, vcase: Page.ICase) => { return; };
       this.EF['_engageform'].navigation.start = ($event) => { return; };
       this.EF['_engageform'].navigation.finish = ($event, vcase: Page.ICase) => { return; };
+
+      // Clone original navigation.pick method
+      this.EF['_engageform'].navigation.truePick = _.clone(this.EF['_engageform'].navigation.pick);
+
+      // Block pick if answers are not allowed
+      this.EF['_engageform'].navigation.pick = (e, n, r) => {
+        if (this.EF.current.liveSettings.acceptResponses) {
+          this.EF['_engageform'].navigation.truePick(e, n, r);
+        } else {
+          this.EF['_engageform'].message = 'Answers are currently not acceptabe';
+        }
+      };
     }
 
     private removePage() {
@@ -181,13 +195,23 @@ module Liveevent {
           }
         }
 
-        // Quiz and page is same, check if showAnswers had change
-        if (this.EF.current && data.showAnswers !== this.EF.current.liveSettings.showAnswers) {
-          console.log('[ Liveevent ] Show answer option changed');
+        // Quiz and page is same, check if showAnswers or acceptResponses had change
+        if (this.EF.current) {
+          if (data.showAnswers !== this.EF.current.liveSettings.showAnswers) {
+            console.log('[ Liveevent ] Show answer option changed');
 
-          Extension.$timeout(() => {
-            this.EF.current.liveSettings.showAnswers = !this.EF.current.liveSettings.showAnswers;
-          });
+            Extension.$timeout(() => {
+              this.EF.current.liveSettings.showAnswers = data.showAnswers;
+            });
+          }
+          if (data.acceptResponses !== this.EF.current.liveSettings.acceptResponses) {
+            console.log('[ Liveevent ] Accept responses option changed');
+
+            Extension.$timeout(() => {
+              this.EF.current.liveSettings.acceptResponses = data.acceptResponses;
+              this.EF['_engageform'].message = '';
+            });
+          }
         }
       });
 
