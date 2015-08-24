@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.16
+ * 4screens-angular-liveevent v0.1.17
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -17,6 +17,7 @@ var Liveevent;
             this.event = new Util.Event();
         }
         Liveevent.prototype.updatePage = function (page) {
+            var _this = this;
             console.log('[ Liveevent ] Update Page: ' + page._id);
             var __type = this.activePage ? (this.activePage.type + '') : null;
             // Check if form and if so, send all inputs
@@ -25,7 +26,8 @@ var Liveevent;
             }
             this.activePage = page;
             this.activePageId = page._id;
-            this.EF['_engageform'].initPage(page); // ts compiler ..
+            this.EF['_engageform'].message = null;
+            this.EF['_engageform'].initPage(page);
             // Add liveSettings
             this.EF.current.liveSettings = page.liveSettings;
             // Overwrite navigation
@@ -45,6 +47,17 @@ var Liveevent;
             this.EF['_engageform'].navigation.next = function ($event, vcase) { return; };
             this.EF['_engageform'].navigation.start = function ($event) { return; };
             this.EF['_engageform'].navigation.finish = function ($event, vcase) { return; };
+            // Clone original navigation.pick method
+            this.EF['_engageform'].navigation.truePick = _.clone(this.EF['_engageform'].navigation.pick);
+            // Block pick if answers are not allowed
+            this.EF['_engageform'].navigation.pick = function (e, n, r) {
+                if (_this.EF.current.liveSettings.acceptResponses) {
+                    _this.EF['_engageform'].navigation.truePick(e, n, r);
+                }
+                else {
+                    _this.EF['_engageform'].message = 'Answers are currently not acceptabe';
+                }
+            };
         };
         Liveevent.prototype.removePage = function () {
             var _this = this;
@@ -150,12 +163,21 @@ var Liveevent;
                         });
                     }
                 }
-                // Quiz and page is same, check if showAnswers had change
-                if (_this.EF.current && data.showAnswers !== _this.EF.current.liveSettings.showAnswers) {
-                    console.log('[ Liveevent ] Show answer option changed');
-                    Extension.$timeout(function () {
-                        _this.EF.current.liveSettings.showAnswers = !_this.EF.current.liveSettings.showAnswers;
-                    });
+                // Quiz and page is same, check if showAnswers or acceptResponses had change
+                if (_this.EF.current) {
+                    if (data.showAnswers !== _this.EF.current.liveSettings.showAnswers) {
+                        console.log('[ Liveevent ] Show answer option changed');
+                        Extension.$timeout(function () {
+                            _this.EF.current.liveSettings.showAnswers = data.showAnswers;
+                        });
+                    }
+                    if (data.acceptResponses !== _this.EF.current.liveSettings.acceptResponses) {
+                        console.log('[ Liveevent ] Accept responses option changed');
+                        Extension.$timeout(function () {
+                            _this.EF.current.liveSettings.acceptResponses = data.acceptResponses;
+                            _this.EF['_engageform'].message = '';
+                        });
+                    }
                 }
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
