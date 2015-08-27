@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.17
+ * 4screens-angular-liveevent v0.1.18
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -97,7 +97,7 @@ var Liveevent;
         // Init chat
         Liveevent.prototype.initChat = function (id) {
             var deferred = Extension.$q.defer();
-            if (!this.chat) {
+            if (!this.chat && id) {
                 this.chat = new ChatModule.Chat(id, this);
                 return this.chat.init();
             }
