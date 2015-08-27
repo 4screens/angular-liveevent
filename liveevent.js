@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.18
+ * 4screens-angular-liveevent v0.1.19
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -18,44 +18,42 @@ var Liveevent;
         }
         Liveevent.prototype.updatePage = function (page) {
             var _this = this;
-            console.log('[ Liveevent ] Update Page: ' + page._id);
+            console.log('[ Liveevent ] Update Page: ' + page._id, this.currentEngageform.navigation);
             var __type = this.activePage ? (this.activePage.type + '') : null;
             // Check if form and if so, send all inputs
             if (__type && __type.indexOf('form') > -1) {
-                this.EF['_engageform'].navigation.pick(null, null, { quiet: true });
+                this.currentEngageform.navigation.pick(null, null, { quiet: true });
             }
             this.activePage = page;
             this.activePageId = page._id;
-            this.EF['_engageform'].message = null;
-            this.EF['_engageform'].initPage(page);
+            this.currentEngageform.message = null;
+            this.currentEngageform.initPage(page);
             // Add liveSettings
-            this.EF.current.liveSettings = page.liveSettings;
+            this.currentEngageform.liveSettings = page.liveSettings;
             // Overwrite navigation
-            this.EF['_engageform'].navigation.enabled = false;
-            this.EF['_engageform'].navigation.position = 0;
-            this.EF['_engageform'].navigation.size = 1;
-            this.EF['_engageform'].navigation.hasStart = false;
-            this.EF['_engageform'].navigation.enabledStart = false;
-            this.EF['_engageform'].navigation.hasPrev = false;
-            this.EF['_engageform'].navigation.enabledPrev = false;
-            this.EF['_engageform'].navigation.hasNext = false;
-            this.EF['_engageform'].navigation.enabledNext = false;
-            this.EF['_engageform'].navigation.hasFinish = false;
-            this.EF['_engageform'].navigation.enabledFinish = false;
-            this.EF['_engageform'].navigation.distance = 0;
-            this.EF['_engageform'].navigation.prev = function ($event) { return; };
-            this.EF['_engageform'].navigation.next = function ($event, vcase) { return; };
-            this.EF['_engageform'].navigation.start = function ($event) { return; };
-            this.EF['_engageform'].navigation.finish = function ($event, vcase) { return; };
-            // Clone original navigation.pick method
-            this.EF['_engageform'].navigation.truePick = _.clone(this.EF['_engageform'].navigation.pick);
+            this.currentEngageform.navigation.enabled = false;
+            this.currentEngageform.navigation.position = 0;
+            this.currentEngageform.navigation.size = 1;
+            this.currentEngageform.navigation.hasStart = false;
+            this.currentEngageform.navigation.enabledStart = false;
+            this.currentEngageform.navigation.hasPrev = false;
+            this.currentEngageform.navigation.enabledPrev = false;
+            this.currentEngageform.navigation.hasNext = false;
+            this.currentEngageform.navigation.enabledNext = false;
+            this.currentEngageform.navigation.hasFinish = false;
+            this.currentEngageform.navigation.enabledFinish = false;
+            this.currentEngageform.navigation.distance = 0;
+            this.currentEngageform.navigation.prev = function ($event) { return; };
+            this.currentEngageform.navigation.next = function ($event, vcase) { return; };
+            this.currentEngageform.navigation.start = function ($event) { return; };
+            this.currentEngageform.navigation.finish = function ($event, vcase) { return; };
             // Block pick if answers are not allowed
-            this.EF['_engageform'].navigation.pick = function (e, n, r) {
-                if (_this.EF.current.liveSettings.acceptResponses) {
-                    _this.EF['_engageform'].navigation.truePick(e, n, r);
+            this.currentEngageform.navigation.pick = function (e, n, r) {
+                if (_this.currentEngageform.liveSettings.acceptResponses) {
+                    _this.currentEngageform.navigation.truePick(e, n, r);
                 }
                 else {
-                    _this.EF['_engageform'].message = 'Answers are currently not acceptabe';
+                    _this.currentEngageform.message = 'Answers are currently not acceptabe';
                 }
             };
         };
@@ -65,16 +63,18 @@ var Liveevent;
             Extension.$timeout(function () {
                 _this.activePage = null;
                 _this.activePageId = null;
-                if (_this.EF['_engageform']) {
-                    _this.EF['_engageform'].current = null;
-                    _this.EF['_engageform'].message = null;
+                if (_this.currentEngageform) {
+                    _this.currentEngageform.current = null;
+                    _this.currentEngageform.message = null;
                 }
             });
         };
         Liveevent.prototype.updateQuiz = function (EF) {
-            console.log('[ Liveevent ] Update Quiz: ' + EF._engageformId);
-            this.activeQuiz = EF;
-            this.activeQuizId = EF._engageformId;
+            console.log('[ Liveevent ] Update Quiz: ' + this.currentEngageform._engageformId);
+            this.currentEngageform = EF;
+            this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+            this.activeQuiz = this.currentEngageform;
+            this.activeQuizId = this.currentEngageform._engageformId;
         };
         Liveevent.prototype.removeQuiz = function () {
             var _this = this;
@@ -82,15 +82,16 @@ var Liveevent;
             Extension.$timeout(function () {
                 _this.activeQuiz = null;
                 _this.activeQuizId = null;
-                if (_this.EF['_engageform']) {
-                    _this.EF['_engageform'].branding = null;
-                    _this.EF['_engageform'].current = null;
-                    _this.EF['_engageform'].message = null;
-                    _this.EF['_engageform'].meta = null;
-                    _this.EF['_engageform'].navigation = null;
-                    _this.EF['_engageform'].theme = null;
-                    _this.EF['_engageform'].title = null;
-                    _this.EF['_engageform'].type = null;
+                _this.currentEngageform = null;
+                if (_this.currentEngageform) {
+                    _this.currentEngageform.branding = null;
+                    _this.currentEngageform.current = null;
+                    _this.currentEngageform.message = null;
+                    _this.currentEngageform.meta = null;
+                    _this.currentEngageform.navigation = null;
+                    _this.currentEngageform.theme = null;
+                    _this.currentEngageform.title = null;
+                    _this.currentEngageform.type = null;
                 }
             });
         };
@@ -121,7 +122,7 @@ var Liveevent;
             });
             this.socket.on('disconnect', this.initSocket);
             this.socket.on('error', function (res) {
-                console.warn(res);
+                console.warn('[ Liveevent:Socket ] Error: ' + res);
             });
             this.socket.on('liveEventStatus', function (data) {
                 // Liveevent is off
@@ -138,6 +139,10 @@ var Liveevent;
                         _this.removeQuiz();
                         return;
                     }
+                    _this.EF.init({ id: data.activeQuizId, mode: 'default' }).then(function (res) {
+                        _this.currentEngageform = res;
+                        console.log('[eform]', _this.currentEngageform);
+                    });
                     // Page is off
                     if (!data.activeQuestionId) {
                         console.log('[ Liveevent ] Page is empty');
@@ -164,24 +169,24 @@ var Liveevent;
                     }
                 }
                 // Quiz and page is same, check if showAnswers or acceptResponses had change
-                if (_this.EF.current) {
-                    if (data.showAnswers !== _this.EF.current.liveSettings.showAnswers) {
+                if (_this.currentEngageform) {
+                    if (data.showAnswers !== _this.currentEngageform.liveSettings.showAnswers) {
                         console.log('[ Liveevent ] Show answer option changed');
                         Extension.$timeout(function () {
-                            _this.EF.current.liveSettings.showAnswers = data.showAnswers;
+                            _this.currentEngageform.liveSettings.showAnswers = data.showAnswers;
                         });
                     }
-                    if (data.acceptResponses !== _this.EF.current.liveSettings.acceptResponses) {
+                    if (data.acceptResponses !== _this.currentEngageform.liveSettings.acceptResponses) {
                         console.log('[ Liveevent ] Accept responses option changed');
                         Extension.$timeout(function () {
-                            _this.EF.current.liveSettings.acceptResponses = data.acceptResponses;
-                            _this.EF['_engageform'].message = '';
+                            _this.currentEngageform.liveSettings.acceptResponses = data.acceptResponses;
+                            _this.currentEngageform.message = '';
                         });
                     }
                 }
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
-                _this.EF.current.updateAnswers(data);
+                _this.currentEngageform.updateAnswers(data);
             });
         };
         // Get Liveevent
