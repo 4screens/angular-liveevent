@@ -115,7 +115,7 @@ module Liveevent {
     private initChat(id: string): ng.IPromise<any> {
       var deferred = Extension.$q.defer();
 
-      if (!this.chat) {
+      if (!this.chat && id) {
         this.chat = new ChatModule.Chat(id, this);
 
         return this.chat.init();
