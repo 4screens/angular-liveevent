@@ -13,6 +13,7 @@ module Liveevent {
     socket: SocketIOClient.Socket;
     EF: Engageform.IEngageform;
     chat: ChatModule.IChat;
+    currentEngageform: Engageform.IEngageform;
 
     event: Util.Event;
 
@@ -23,51 +24,48 @@ module Liveevent {
     }
 
     private updatePage(page) {
-      console.log('[ Liveevent ] Update Page: ' + page._id);
+      console.log('[ Liveevent ] Update Page: ' + page._id, this.currentEngageform.navigation);
 
       var __type = this.activePage ? (this.activePage.type + '') : null;
 
       // Check if form and if so, send all inputs
       if (__type && __type.indexOf('form') > -1) {
-        this.EF['_engageform'].navigation.pick(null, null, {quiet: true});
+        this.currentEngageform.navigation.pick(null, null, {quiet: true});
       }
 
       this.activePage = page;
       this.activePageId = page._id;
 
-      this.EF['_engageform'].message = null;
-      this.EF['_engageform'].initPage(page);
+      this.currentEngageform.message = null;
+      this.currentEngageform.initPage(page);
 
       // Add liveSettings
-      this.EF.current.liveSettings = <Page.ILiveSetting>page.liveSettings;
+      this.currentEngageform.liveSettings = <Page.ILiveSetting>page.liveSettings;
 
       // Overwrite navigation
-      this.EF['_engageform'].navigation.enabled = false;
-      this.EF['_engageform'].navigation.position = 0;
-      this.EF['_engageform'].navigation.size = 1;
-      this.EF['_engageform'].navigation.hasStart = false;
-      this.EF['_engageform'].navigation.enabledStart = false;
-      this.EF['_engageform'].navigation.hasPrev = false;
-      this.EF['_engageform'].navigation.enabledPrev = false;
-      this.EF['_engageform'].navigation.hasNext = false;
-      this.EF['_engageform'].navigation.enabledNext = false;
-      this.EF['_engageform'].navigation.hasFinish = false;
-      this.EF['_engageform'].navigation.enabledFinish = false;
-      this.EF['_engageform'].navigation.distance = 0;
-      this.EF['_engageform'].navigation.prev = ($event) => { return; };
-      this.EF['_engageform'].navigation.next = ($event, vcase: Page.ICase) => { return; };
-      this.EF['_engageform'].navigation.start = ($event) => { return; };
-      this.EF['_engageform'].navigation.finish = ($event, vcase: Page.ICase) => { return; };
-
-      // Clone original navigation.pick method
-      this.EF['_engageform'].navigation.truePick = _.clone(this.EF['_engageform'].navigation.pick);
+      this.currentEngageform.navigation.enabled = false;
+      this.currentEngageform.navigation.position = 0;
+      this.currentEngageform.navigation.size = 1;
+      this.currentEngageform.navigation.hasStart = false;
+      this.currentEngageform.navigation.enabledStart = false;
+      this.currentEngageform.navigation.hasPrev = false;
+      this.currentEngageform.navigation.enabledPrev = false;
+      this.currentEngageform.navigation.hasNext = false;
+      this.currentEngageform.navigation.enabledNext = false;
+      this.currentEngageform.navigation.hasFinish = false;
+      this.currentEngageform.navigation.enabledFinish = false;
+      this.currentEngageform.navigation.distance = 0;
+      this.currentEngageform.navigation.prev = ($event) => { return; };
+      this.currentEngageform.navigation.next = ($event, vcase: Page.ICase) => { return; };
+      this.currentEngageform.navigation.start = ($event) => { return; };
+      this.currentEngageform.navigation.finish = ($event, vcase: Page.ICase) => { return; };
 
       // Block pick if answers are not allowed
-      this.EF['_engageform'].navigation.pick = (e, n, r) => {
-        if (this.EF.current.liveSettings.acceptResponses) {
-          this.EF['_engageform'].navigation.truePick(e, n, r);
+      this.currentEngageform.navigation.pick = (e, n, r) => {
+        if (this.currentEngageform.liveSettings.acceptResponses) {
+          this.currentEngageform.navigation.truePick(e, n, r);
         } else {
-          this.EF['_engageform'].message = 'Answers are currently not acceptabe';
+          this.currentEngageform.message = 'Answers are currently not acceptabe';
         }
       };
     }
@@ -78,18 +76,21 @@ module Liveevent {
         this.activePage = null;
         this.activePageId = null;
 
-        if (this.EF['_engageform']) {
-          this.EF['_engageform'].current = null;
-          this.EF['_engageform'].message = null;
+        if (this.currentEngageform) {
+          this.currentEngageform.current = null;
+          this.currentEngageform.message = null;
         }
       });
     }
 
     private updateQuiz(EF) {
-      console.log('[ Liveevent ] Update Quiz: ' + EF._engageformId);
+      console.log('[ Liveevent ] Update Quiz: ' + this.currentEngageform._engageformId);
 
-      this.activeQuiz = EF;
-      this.activeQuizId = EF._engageformId;
+      this.currentEngageform = EF;
+      this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+
+      this.activeQuiz = this.currentEngageform;
+      this.activeQuizId = this.currentEngageform._engageformId;
     }
 
     private removeQuiz() {
@@ -97,16 +98,17 @@ module Liveevent {
       Extension.$timeout(() => {
         this.activeQuiz = null;
         this.activeQuizId = null;
+        this.currentEngageform = null;
 
-        if (this.EF['_engageform']) {
-          this.EF['_engageform'].branding = null;
-          this.EF['_engageform'].current = null;
-          this.EF['_engageform'].message = null;
-          this.EF['_engageform'].meta = null;
-          this.EF['_engageform'].navigation = null;
-          this.EF['_engageform'].theme = null;
-          this.EF['_engageform'].title = null;
-          this.EF['_engageform'].type = null;
+        if (this.currentEngageform) {
+          this.currentEngageform.branding = null;
+          this.currentEngageform.current = null;
+          this.currentEngageform.message = null;
+          this.currentEngageform.meta = null;
+          this.currentEngageform.navigation = null;
+          this.currentEngageform.theme = null;
+          this.currentEngageform.title = null;
+          this.currentEngageform.type = null;
         }
       });
     }
@@ -142,7 +144,7 @@ module Liveevent {
       this.socket.on('disconnect', this.initSocket);
 
       this.socket.on('error', (res) => {
-        console.warn(res);
+        console.warn('[ Liveevent:Socket ] Error: ' + res);
       });
 
       this.socket.on('liveEventStatus', (data) => {
@@ -166,9 +168,15 @@ module Liveevent {
             return;
           }
 
+          this.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
+            this.currentEngageform = res;
+
+            console.log('[eform]', this.currentEngageform);
+          });
+
           // Page is off
           if (!data.activeQuestionId) {
-            console.log('[ Liveevent ] Page is empty');
+              console.log('[ Liveevent ] Page is empty');
             this.removePage();
 
             return;
@@ -196,27 +204,27 @@ module Liveevent {
         }
 
         // Quiz and page is same, check if showAnswers or acceptResponses had change
-        if (this.EF.current) {
-          if (data.showAnswers !== this.EF.current.liveSettings.showAnswers) {
+        if (this.currentEngageform) {
+          if (data.showAnswers !== this.currentEngageform.liveSettings.showAnswers) {
             console.log('[ Liveevent ] Show answer option changed');
 
             Extension.$timeout(() => {
-              this.EF.current.liveSettings.showAnswers = data.showAnswers;
+              this.currentEngageform.liveSettings.showAnswers = data.showAnswers;
             });
           }
-          if (data.acceptResponses !== this.EF.current.liveSettings.acceptResponses) {
+          if (data.acceptResponses !== this.currentEngageform.liveSettings.acceptResponses) {
             console.log('[ Liveevent ] Accept responses option changed');
 
             Extension.$timeout(() => {
-              this.EF.current.liveSettings.acceptResponses = data.acceptResponses;
-              this.EF['_engageform'].message = '';
+              this.currentEngageform.liveSettings.acceptResponses = data.acceptResponses;
+              this.currentEngageform.message = '';
             });
           }
         }
       });
 
       this.socket.on('multipleChoiceQuestionAnswers', (data) => {
-        this.EF.current.updateAnswers(data);
+        this.currentEngageform.updateAnswers(data);
       });
     }
 
@@ -260,7 +268,6 @@ module Liveevent {
 
       // Get Liveevent
       this.getById(opts.id).then((res) => {
-
         // Init socket
         this.initSocket(opts);
 
