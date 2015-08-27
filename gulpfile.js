@@ -1,9 +1,13 @@
+'use strict';
+
 var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
 var pkg = require('./package.json');
 var path = require('path');
 var semver = require('semver');
 var sh = require('shelljs');
+
+plugins.minimist = require('minimist')(process.argv.slice(2));
 
 var PATH = {
   bower_components: 'bower_components',
@@ -78,6 +82,15 @@ gulp.task('minify', ['build'], function() {
     .pipe(plugins.rename({extname: '.min.js'}))
     .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest(PATH.build));
+});
+
+gulp.task('publish', ['minify'], function() {
+  gulp.watch(FILES, ['publish::copy']);
+});
+
+gulp.task('publish::copy', ['tslint'], function() {
+  return gulp.src(MAIN)
+    .pipe(gulp.dest(plugins.minimist.path || '../4screens-suros/app/bower_components/4screens-engageform2/'));
 });
 
 gulp.task('develop', ['tslint'], function() {
