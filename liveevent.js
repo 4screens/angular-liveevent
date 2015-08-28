@@ -132,7 +132,6 @@ var Liveevent;
                     _this.removeQuiz();
                     // Run callback
                     if (opts.callback && opts.callback.liveEventStatus) {
-                        data.id = opts.id;
                         opts.callback.liveEventStatus(data);
                     }
                     return;
@@ -144,14 +143,12 @@ var Liveevent;
                         _this.removeQuiz();
                         // Run callback
                         if (opts.callback && opts.callback.liveEventStatus) {
-                            data.id = opts.id;
                             opts.callback.liveEventStatus(data);
                         }
                         return;
                     }
                     _this.EF.init({ id: data.activeQuizId, mode: 'default' }).then(function (res) {
                         _this.currentEngageform = res;
-                        console.log('[eform]', _this.currentEngageform);
                     });
                     // Page is off
                     if (!data.activeQuestionId) {
@@ -159,7 +156,6 @@ var Liveevent;
                         _this.removePage();
                         // Run callback
                         if (opts.callback && opts.callback.liveEventStatus) {
-                            data.id = opts.id;
                             opts.callback.liveEventStatus(data);
                         }
                         return;
@@ -201,12 +197,11 @@ var Liveevent;
                 }
                 // Run callback
                 if (opts.callback && opts.callback.liveEventStatus) {
-                    data.id = opts.id;
                     opts.callback.liveEventStatus(data);
                 }
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
-                _this.currentEngageform.updateAnswers(data);
+                _this.currentEngageform.current.updateAnswers(data);
             });
         };
         // Get Liveevent
