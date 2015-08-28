@@ -156,6 +156,11 @@ module Liveevent {
           this.removePage();
           this.removeQuiz();
 
+          // Run callback
+          if (opts.callback.liveEventStatus) {
+            opts.callback.liveEventStatus(data);
+          }
+
           return;
         }
 
@@ -165,6 +170,11 @@ module Liveevent {
           if (!data.activeQuizId) {
             console.log('[ Liveevent ] Quiz is empty');
             this.removeQuiz();
+
+            // Run callback
+            if (opts.callback.liveEventStatus) {
+              opts.callback.liveEventStatus(data);
+            }
 
             return;
           }
@@ -179,6 +189,11 @@ module Liveevent {
           if (!data.activeQuestionId) {
               console.log('[ Liveevent ] Page is empty');
             this.removePage();
+
+            // Run callback
+            if (opts.callback.liveEventStatus) {
+              opts.callback.liveEventStatus(data);
+            }
 
             return;
           }
@@ -221,6 +236,11 @@ module Liveevent {
               this.currentEngageform.message = '';
             });
           }
+        }
+
+        // Run callback
+        if (opts.callback.liveEventStatus) {
+          opts.callback.liveEventStatus();
         }
       });
 

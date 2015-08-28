@@ -18,5 +18,6 @@ module API {
     id: string;
     engageform: Engageform.IEngageform;
     io: SocketIOClientStatic;
+    callback: {};
   }
 }
