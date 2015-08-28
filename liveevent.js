@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.21
+ * 4screens-angular-liveevent v0.1.22
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -131,7 +131,7 @@ var Liveevent;
                     _this.removePage();
                     _this.removeQuiz();
                     // Run callback
-                    if (opts.callback.liveEventStatus) {
+                    if (opts.callback && opts.callback.liveEventStatus) {
                         opts.callback.liveEventStatus(data);
                     }
                     return;
@@ -142,7 +142,7 @@ var Liveevent;
                         console.log('[ Liveevent ] Quiz is empty');
                         _this.removeQuiz();
                         // Run callback
-                        if (opts.callback.liveEventStatus) {
+                        if (opts.callback && opts.callback.liveEventStatus) {
                             opts.callback.liveEventStatus(data);
                         }
                         return;
@@ -156,7 +156,7 @@ var Liveevent;
                         console.log('[ Liveevent ] Page is empty');
                         _this.removePage();
                         // Run callback
-                        if (opts.callback.liveEventStatus) {
+                        if (opts.callback && opts.callback.liveEventStatus) {
                             opts.callback.liveEventStatus(data);
                         }
                         return;
@@ -197,8 +197,8 @@ var Liveevent;
                     }
                 }
                 // Run callback
-                if (opts.callback.liveEventStatus) {
-                    opts.callback.liveEventStatus();
+                if (opts.callback && opts.callback.liveEventStatus) {
+                    opts.callback.liveEventStatus(data);
                 }
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
