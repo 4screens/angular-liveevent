@@ -157,7 +157,7 @@ module Liveevent {
           this.removeQuiz();
 
           // Run callback
-          if (opts.callback.liveEventStatus) {
+          if (opts.callback && opts.callback.liveEventStatus) {
             opts.callback.liveEventStatus(data);
           }
 
@@ -172,7 +172,7 @@ module Liveevent {
             this.removeQuiz();
 
             // Run callback
-            if (opts.callback.liveEventStatus) {
+            if (opts.callback && opts.callback.liveEventStatus) {
               opts.callback.liveEventStatus(data);
             }
 
@@ -191,7 +191,7 @@ module Liveevent {
             this.removePage();
 
             // Run callback
-            if (opts.callback.liveEventStatus) {
+            if (opts.callback && opts.callback.liveEventStatus) {
               opts.callback.liveEventStatus(data);
             }
 
@@ -239,8 +239,8 @@ module Liveevent {
         }
 
         // Run callback
-        if (opts.callback.liveEventStatus) {
-          opts.callback.liveEventStatus();
+        if (opts.callback && opts.callback.liveEventStatus) {
+          opts.callback.liveEventStatus(data);
         }
       });
 
