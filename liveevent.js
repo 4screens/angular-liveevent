@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.20
+ * 4screens-angular-liveevent v0.1.21
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -130,6 +130,10 @@ var Liveevent;
                     console.log('[ Liveevent:Socket ] Liveevent is not active');
                     _this.removePage();
                     _this.removeQuiz();
+                    // Run callback
+                    if (opts.callback.liveEventStatus) {
+                        opts.callback.liveEventStatus(data);
+                    }
                     return;
                 }
                 if (data.activeQuestionId !== _this.activePageId || data.activeQuizId !== _this.activeQuizId) {
@@ -137,6 +141,10 @@ var Liveevent;
                     if (!data.activeQuizId) {
                         console.log('[ Liveevent ] Quiz is empty');
                         _this.removeQuiz();
+                        // Run callback
+                        if (opts.callback.liveEventStatus) {
+                            opts.callback.liveEventStatus(data);
+                        }
                         return;
                     }
                     _this.EF.init({ id: data.activeQuizId, mode: 'default' }).then(function (res) {
@@ -147,6 +155,10 @@ var Liveevent;
                     if (!data.activeQuestionId) {
                         console.log('[ Liveevent ] Page is empty');
                         _this.removePage();
+                        // Run callback
+                        if (opts.callback.liveEventStatus) {
+                            opts.callback.liveEventStatus(data);
+                        }
                         return;
                     }
                     // Quiz changed
@@ -183,6 +195,10 @@ var Liveevent;
                             _this.currentEngageform.message = '';
                         });
                     }
+                }
+                // Run callback
+                if (opts.callback.liveEventStatus) {
+                    opts.callback.liveEventStatus();
                 }
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
