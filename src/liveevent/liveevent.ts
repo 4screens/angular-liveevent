@@ -65,7 +65,7 @@ module Liveevent {
         if (this.currentEngageform.liveSettings.acceptResponses) {
           this.currentEngageform.navigation.truePick(e, n, r);
         } else {
-          this.currentEngageform.message = 'Answers are currently not acceptabe';
+          this.currentEngageform.message = 'Answers are currently not accepting';
         }
       };
     }
