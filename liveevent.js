@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.24
+ * 4screens-angular-liveevent v0.1.25
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -53,7 +53,7 @@ var Liveevent;
                     _this.currentEngageform.navigation.truePick(e, n, r);
                 }
                 else {
-                    _this.currentEngageform.message = 'Answers are currently not acceptabe';
+                    _this.currentEngageform.message = 'Answers are currently not accepting';
                 }
             };
         };
