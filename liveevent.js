@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.22
+ * 4screens-angular-liveevent v0.1.23
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -132,6 +132,7 @@ var Liveevent;
                     _this.removeQuiz();
                     // Run callback
                     if (opts.callback && opts.callback.liveEventStatus) {
+                        data.id = opts.id;
                         opts.callback.liveEventStatus(data);
                     }
                     return;
@@ -143,6 +144,7 @@ var Liveevent;
                         _this.removeQuiz();
                         // Run callback
                         if (opts.callback && opts.callback.liveEventStatus) {
+                            data.id = opts.id;
                             opts.callback.liveEventStatus(data);
                         }
                         return;
@@ -157,6 +159,7 @@ var Liveevent;
                         _this.removePage();
                         // Run callback
                         if (opts.callback && opts.callback.liveEventStatus) {
+                            data.id = opts.id;
                             opts.callback.liveEventStatus(data);
                         }
                         return;
@@ -198,6 +201,7 @@ var Liveevent;
                 }
                 // Run callback
                 if (opts.callback && opts.callback.liveEventStatus) {
+                    data.id = opts.id;
                     opts.callback.liveEventStatus(data);
                 }
             });
