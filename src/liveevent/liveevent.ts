@@ -181,8 +181,6 @@ module Liveevent {
 
           this.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
             this.currentEngageform = res;
-
-            console.log('[eform]', this.currentEngageform);
           });
 
           // Page is off
@@ -245,7 +243,7 @@ module Liveevent {
       });
 
       this.socket.on('multipleChoiceQuestionAnswers', (data) => {
-        this.currentEngageform.updateAnswers(data);
+        this.currentEngageform.current.updateAnswers(data);
       });
     }
 
