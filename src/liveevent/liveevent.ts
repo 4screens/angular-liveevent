@@ -158,6 +158,7 @@ module Liveevent {
 
           // Run callback
           if (opts.callback && opts.callback.liveEventStatus) {
+            data.id = opts.id;
             opts.callback.liveEventStatus(data);
           }
 
@@ -173,6 +174,7 @@ module Liveevent {
 
             // Run callback
             if (opts.callback && opts.callback.liveEventStatus) {
+              data.id = opts.id;
               opts.callback.liveEventStatus(data);
             }
 
@@ -190,6 +192,7 @@ module Liveevent {
 
             // Run callback
             if (opts.callback && opts.callback.liveEventStatus) {
+              data.id = opts.id;
               opts.callback.liveEventStatus(data);
             }
 
@@ -238,6 +241,7 @@ module Liveevent {
 
         // Run callback
         if (opts.callback && opts.callback.liveEventStatus) {
+          data.id = opts.id;
           opts.callback.liveEventStatus(data);
         }
       });
