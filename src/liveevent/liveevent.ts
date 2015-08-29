@@ -199,7 +199,6 @@ module Liveevent {
             return;
           }
 
-
           // Quiz changed
           if (data.activeQuizId !== this.activeQuizId) {
             console.log('[ Liveevent:Socket ] Quiz changed');
@@ -248,6 +247,15 @@ module Liveevent {
 
       this.socket.on('multipleChoiceQuestionAnswers', (data) => {
         this.currentEngageform.current.updateAnswers(data);
+      });
+
+      // Buzzer listening
+      this.socket.on('buzzerQuestionStatus', (data) => {
+        // Run callback
+        if (opts.callback && opts.callback.buzzerQuestionStatus) {
+          data.id = opts.id;
+          opts.callback.buzzerQuestionStatus(data);
+        }
       });
     }
 
