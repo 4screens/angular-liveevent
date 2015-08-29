@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.25
+ * 4screens-angular-liveevent v0.1.26
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -206,6 +206,14 @@ var Liveevent;
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
                 _this.currentEngageform.current.updateAnswers(data);
+            });
+            // Buzzer listening
+            this.socket.on('buzzerQuestionStatus', function (data) {
+                // Run callback
+                if (opts.callback && opts.callback.buzzerQuestionStatus) {
+                    data.id = opts.id;
+                    opts.callback.buzzerQuestionStatus(data);
+                }
             });
         };
         // Get Liveevent
