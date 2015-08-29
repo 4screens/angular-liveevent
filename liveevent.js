@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.26
+ * 4screens-angular-liveevent v0.1.27
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -149,7 +149,7 @@ var Liveevent;
                         }
                         return;
                     }
-                    _this.EF.init({ id: data.activeQuizId, mode: 'default' }).then(function (res) {
+                    _this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: _this.sendAnswerCallback } }).then(function (res) {
                         _this.currentEngageform = res;
                     });
                     // Page is off
@@ -166,7 +166,7 @@ var Liveevent;
                     // Quiz changed
                     if (data.activeQuizId !== _this.activeQuizId) {
                         console.log('[ Liveevent:Socket ] Quiz changed');
-                        _this.EF.init({ id: data.activeQuizId, mode: 'default' }).then(function (res) {
+                        _this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: _this.sendAnswerCallback } }).then(function (res) {
                             _this.updateQuiz(res);
                             // Update Page
                             _this.getPageById(data.activeQuestionId).then(function (page) {
@@ -246,6 +246,7 @@ var Liveevent;
             var deferred = Extension.$q.defer();
             this.id = opts.id;
             this.EF = opts.engageform;
+            this.sendAnswerCallback = opts.callback.sendAnswerCallback;
             // Get Liveevent
             this.getById(opts.id).then(function (res) {
                 // Init socket
