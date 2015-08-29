@@ -14,6 +14,7 @@ module Liveevent {
     EF: Engageform.IEngageform;
     chat: ChatModule.IChat;
     currentEngageform: Engageform.IEngageform;
+    sendAnswerCallback: ISendAnswerCallback;
 
     event: Util.Event;
 
@@ -181,7 +182,7 @@ module Liveevent {
             return;
           }
 
-          this.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
+          this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: this.sendAnswerCallback }}).then((res) => {
             this.currentEngageform = res;
           });
 
@@ -202,8 +203,8 @@ module Liveevent {
           // Quiz changed
           if (data.activeQuizId !== this.activeQuizId) {
             console.log('[ Liveevent:Socket ] Quiz changed');
-            this.EF.init({ id: data.activeQuizId, mode: 'default' }).then((res) => {
-              this.updateQuiz(res);
+            this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: this.sendAnswerCallback } }).then((res) => {
+                this.updateQuiz(res);
 
               // Update Page
               this.getPageById(data.activeQuestionId).then((page) => {
@@ -296,6 +297,7 @@ module Liveevent {
 
       this.id = opts.id;
       this.EF = opts.engageform;
+      this.sendAnswerCallback = opts.callback.sendAnswerCallback;
 
       // Get Liveevent
       this.getById(opts.id).then((res) => {
