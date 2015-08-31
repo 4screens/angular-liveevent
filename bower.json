@@ -1,6 +1,6 @@
 {
   "name": "4screens-liveevent",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "main": "liveevent.js",
   "homepage": "https://github.com/4screens/angular-liveevent",
   "authors": [

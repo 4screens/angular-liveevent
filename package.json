@@ -1,6 +1,6 @@
 {
   "name": "4screens-angular-liveevent",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Extension for Angular 4screens EngageForm",
   "main": "gulpfile.js",
   "scripts": {
