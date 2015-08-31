@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.27
+ * 4screens-angular-liveevent v0.1.29
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -206,6 +206,9 @@ var Liveevent;
                     data.id = opts.id;
                     opts.callback.liveEventStatus(data);
                 }
+            });
+            this.socket.on('rateItQuestionStatus', function (data) {
+                _this.currentEngageform.current.updateAnswers(data);
             });
             this.socket.on('multipleChoiceQuestionAnswers', function (data) {
                 _this.currentEngageform.current.updateAnswers(data);
