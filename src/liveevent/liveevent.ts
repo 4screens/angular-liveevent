@@ -250,8 +250,12 @@ module Liveevent {
         }
       });
 
+      this.socket.on('rateItQuestionStatus', (data) => {
+        this.currentEngageform.current.updateAnswers(data);
+      });
+
       this.socket.on('multipleChoiceQuestionAnswers', (data) => {
-          this.currentEngageform.current.updateAnswers(data);
+        this.currentEngageform.current.updateAnswers(data);
       });
 
       // Buzzer listening
