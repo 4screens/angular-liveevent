@@ -61,6 +61,10 @@ module Liveevent {
       this.currentEngageform.navigation.start = ($event) => { return; };
       this.currentEngageform.navigation.finish = ($event, vcase: Page.ICase) => { return; };
 
+      if (!this.currentEngageform.navigation.truePick) {
+        this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+      }
+
       // Block pick if answers are not allowed
       this.currentEngageform.navigation.pick = (e, n, r) => {
         if (this.currentEngageform.liveSettings.acceptResponses) {
@@ -247,7 +251,7 @@ module Liveevent {
       });
 
       this.socket.on('multipleChoiceQuestionAnswers', (data) => {
-        this.currentEngageform.current.updateAnswers(data);
+          this.currentEngageform.current.updateAnswers(data);
       });
 
       // Buzzer listening
