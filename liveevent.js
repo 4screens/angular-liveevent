@@ -47,6 +47,9 @@ var Liveevent;
             this.currentEngageform.navigation.next = function ($event, vcase) { return; };
             this.currentEngageform.navigation.start = function ($event) { return; };
             this.currentEngageform.navigation.finish = function ($event, vcase) { return; };
+            if (!this.currentEngageform.navigation.truePick) {
+                this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+            }
             // Block pick if answers are not allowed
             this.currentEngageform.navigation.pick = function (e, n, r) {
                 if (_this.currentEngageform.liveSettings.acceptResponses) {
