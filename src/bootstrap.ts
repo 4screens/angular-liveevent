@@ -34,11 +34,13 @@ class Extension {
 
     if (!opts.callback) {
       opts.callback = {
-        sendAnswerCallback: null
+        sendAnswerCallback: function(){}
       }
     } else if (!opts.callback.sendAnswerCallback) {
-      opts.callback.sendAnswerCallback = null;
+      opts.callback.sendAnswerCallback = function(){};
     }
+
+    console.log('[opts]',opts);
 
     return Extension._instances[opts.id] = liveEvent.init(opts);
   }
