@@ -93,7 +93,9 @@ module Liveevent {
 
       console.log('[ Liveevent ] Update Quiz: ' + this.currentEngageform._engageformId);
 
-      this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+      if (!this.currentEngageform.navigation.truePick) {
+        this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+      }
 
       this.activeQuiz = this.currentEngageform;
       this.activeQuizId = this.currentEngageform._engageformId;
@@ -260,6 +262,7 @@ module Liveevent {
 
       // Buzzer listening
       this.socket.on('buzzerQuestionStatus', (data) => {
+
         // Run callback
         if (opts.callback && opts.callback.buzzerQuestionStatus) {
           data.id = opts.id;
