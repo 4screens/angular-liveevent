@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.29
+ * 4screens-angular-liveevent v0.1.30
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -75,7 +75,9 @@ var Liveevent;
         Liveevent.prototype.updateQuiz = function (EF) {
             this.currentEngageform = EF;
             console.log('[ Liveevent ] Update Quiz: ' + this.currentEngageform._engageformId);
-            this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+            if (!this.currentEngageform.navigation.truePick) {
+                this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
+            }
             this.activeQuiz = this.currentEngageform;
             this.activeQuizId = this.currentEngageform._engageformId;
         };
