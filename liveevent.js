@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.31
+ * 4screens-angular-liveevent v0.1.32
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -419,12 +419,13 @@ var Extension = (function () {
         var liveEvent = new Liveevent.Liveevent();
         if (!opts.callback) {
             opts.callback = {
-                sendAnswerCallback: null
+                sendAnswerCallback: function () { }
             };
         }
         else if (!opts.callback.sendAnswerCallback) {
-            opts.callback.sendAnswerCallback = null;
+            opts.callback.sendAnswerCallback = function () { };
         }
+        console.log('[opts]', opts);
         return Extension._instances[opts.id] = liveEvent.init(opts);
     };
     Extension._instances = {};
