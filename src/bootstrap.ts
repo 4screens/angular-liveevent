@@ -31,6 +31,15 @@ class Extension {
     Extension.io = <SocketIOClientStatic>opts.io;
 
     var liveEvent = new Liveevent.Liveevent();
+
+    if (!opts.callback) {
+      opts.callback = {
+        sendAnswerCallback: null
+      }
+    } else if (!opts.callback.sendAnswerCallback) {
+      opts.callback.sendAnswerCallback = null;
+    }
+
     return Extension._instances[opts.id] = liveEvent.init(opts);
   }
 }
