@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.32
+ * 4screens-angular-liveevent v0.1.33
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -425,7 +425,6 @@ var Extension = (function () {
         else if (!opts.callback.sendAnswerCallback) {
             opts.callback.sendAnswerCallback = function () { };
         }
-        console.log('[opts]', opts);
         return Extension._instances[opts.id] = liveEvent.init(opts);
     };
     Extension._instances = {};
