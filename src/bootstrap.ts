@@ -40,8 +40,6 @@ class Extension {
       opts.callback.sendAnswerCallback = function(){};
     }
 
-    console.log('[opts]',opts);
-
     return Extension._instances[opts.id] = liveEvent.init(opts);
   }
 }
