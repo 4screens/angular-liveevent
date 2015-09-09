@@ -155,6 +155,19 @@ module Liveevent {
         console.warn('[ Liveevent:Socket ] Error: ' + res);
       });
 
+      this.socket.on('reconnecting', () => {
+        console.warn('[ Liveevent:Socket ] Reconnecting');
+      });
+
+      this.socket.on('reconnect_failed', () => {
+        console.warn('[ Liveevent:Socket ] Reconnect failed');
+      });
+
+      this.socket.on('reconnect', () => {
+        console.log('[ Liveevent:Socket ] Reconnect');
+        this.socket.emit('getStatus', { liveEventId: opts.id });
+      });
+
       this.socket.on('liveEventStatus', (data) => {
 
         // Liveevent is off
