@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.33
+ * 4screens-angular-liveevent v0.1.34
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -128,6 +128,16 @@ var Liveevent;
             this.socket.on('disconnect', this.initSocket);
             this.socket.on('error', function (res) {
                 console.warn('[ Liveevent:Socket ] Error: ' + res);
+            });
+            this.socket.on('reconnecting', function () {
+                console.warn('[ Liveevent:Socket ] Reconnecting');
+            });
+            this.socket.on('reconnect_failed', function () {
+                console.warn('[ Liveevent:Socket ] Reconnect failed');
+            });
+            this.socket.on('reconnect', function () {
+                console.log('[ Liveevent:Socket ] Reconnect');
+                _this.socket.emit('getStatus', { liveEventId: opts.id });
             });
             this.socket.on('liveEventStatus', function (data) {
                 // Liveevent is off
