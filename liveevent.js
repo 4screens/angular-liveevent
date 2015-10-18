@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.35
+ * 4screens-angular-liveevent v0.1.36
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
