@@ -19,6 +19,7 @@
 /// <reference path="engageform/iengageform.ts" />
 /// <reference path="engageform/isettings.ts" />
 /// <reference path="engageform/itheme.ts" />
+/// <reference path="engageform/itabs.ts" />
 
 /// <reference path="branding/ibranding.ts" />
 
