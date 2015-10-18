@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.36
+ * 4screens-angular-liveevent v0.1.37
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -462,6 +462,7 @@ app.service('Liveevent', Extension);
 /// <reference path="engageform/iengageform.ts" />
 /// <reference path="engageform/isettings.ts" />
 /// <reference path="engageform/itheme.ts" />
+/// <reference path="engageform/itabs.ts" />
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 
