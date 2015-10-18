@@ -6,6 +6,7 @@ module Engageform {
     settings: ISetting;
     theme: ITheme;
     branding: Branding.IBranding;
+    tabs: ITabs;
 
     current: Page.IPage;
     message: string;

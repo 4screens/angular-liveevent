@@ -12,5 +12,8 @@ module Engageform {
     font: string;
     questionColor: string;
     customThemeCssFile: string;
+    tabFontColor: string;
+    tabColor: string;
+    tabBorderColor: string;
   }
 }

@@ -6,6 +6,12 @@ module API {
     title: string;
     type: string;
 
+    tabs: {
+      chatTitle: string;
+      liveTitle: string;
+      logoUrl: string;
+    };
+
     settings: {
       allowAnswerChange: boolean;
       branding?: Branding.IBrandingData,
@@ -29,6 +35,9 @@ module API {
       font: string;
       questionColor: string;
       customThemeCssFile: string;
+      tabFontColor: string;
+      tabColor: string;
+      tabBorderColor: string;
     };
   }
 }
