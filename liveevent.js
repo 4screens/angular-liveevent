@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.37
+ * 4screens-angular-liveevent v0.1.38
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -348,6 +348,9 @@ var ChatModule;
                         _this.messages.reverse();
                     }
                 }
+                _.forEach(_this.messages, function (message) {
+                    _this._liveevent.event.trigger('chat::message', _this._liveevent.id, message);
+                });
             });
         };
         Chat.prototype.initSocket = function () {
@@ -379,6 +382,7 @@ var ChatModule;
             });
             this.socket.on('msgHide', function (id) {
                 console.log('[ Chat:Socket] Hide msg');
+                _this._liveevent.event.trigger('chat::hideMessage', id);
                 var messageIndex = _this.messages.length;
                 for (var i = 0; i < _this.messages.length; i += 1) {
                     if (_this.messages[i].id === id) {
@@ -483,9 +487,24 @@ var Util;
             if (!this._listener[event]) {
                 this._listener[event] = [];
             }
-            this._listener[event].push({
-                next: callback
-            });
+            this._listener[event].push(callback);
+        };
+        /**
+         * Removes one or all calbacks from the registered listeners.
+         *
+         * @param {String} event
+         * @param {Function} callback
+           */
+        Event.prototype.unsubscribe = function (event, callback) {
+            console.log('[ Util:Event ] unsubscribe', event);
+            if (this._listener[event]) {
+                if (!callback) {
+                    this._listener[event].length = 0;
+                }
+                else {
+                    _.pull(this._listener[event], callback);
+                }
+            }
         };
         /**
          * Fire event with given arguments.
@@ -505,7 +524,7 @@ var Util;
                 return;
             }
             for (var i = 0; i < listeners.length; i++) {
-                listeners[i].next.apply(null, args);
+                listeners[i].apply(null, args);
             }
         };
         return Event;
