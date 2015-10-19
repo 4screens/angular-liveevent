@@ -86,6 +86,9 @@ module ChatModule {
           }
         }
 
+        _.forEach(this.messages, (message) => {
+          this._liveevent.event.trigger('chat::message', this._liveevent.id, message);
+        })
       });
     }
 
@@ -114,7 +117,6 @@ module ChatModule {
 
         this._liveevent.event.trigger('chat::message', this._liveevent.id, <IMessage>data);
         Extension.$rootScope.$apply(() => {
-
           if (this.direction && this.direction === 'ttb') {
             this.messages.push(<IMessage>data);
           } else {
@@ -126,6 +128,8 @@ module ChatModule {
 
       this.socket.on('msgHide', (id) => {
         console.log('[ Chat:Socket] Hide msg');
+
+        this._liveevent.event.trigger('chat::hideMessage', id);
 
         var messageIndex = this.messages.length;
 

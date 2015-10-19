@@ -2,6 +2,7 @@ module Util {
   export interface IEvent {
     listen(event: string, callback: any): void;
     trigger(event: string, ...data: any[]): void;
+    unsubscribe(event: string, callback: any): void;
   }
 
   export interface IListenersDictionary {
@@ -9,7 +10,7 @@ module Util {
   }
 
   export interface IListener {
-    next: any;
+    (): void;
   }
 
   export class Event implements IEvent {
@@ -28,9 +29,25 @@ module Util {
         this._listener[event] = [];
       }
 
-      this._listener[event].push({
-        next: callback
-      });
+      this._listener[event].push(callback);
+    }
+
+    /**
+     * Removes one or all calbacks from the registered listeners.
+     *
+     * @param {String} event
+     * @param {Function} callback
+       */
+    unsubscribe(event: string, callback?: any): void {
+      console.log('[ Util:Event ] unsubscribe', event);
+
+      if (this._listener[event]) {
+        if (!callback) {
+          this._listener[event].length = 0;
+        } else {
+          _.pull(this._listener[event], callback);
+        }
+      }
     }
 
     /**
@@ -50,7 +67,7 @@ module Util {
       }
 
       for (var i=0; i<listeners.length; i++) {
-        listeners[i].next.apply(null, args);
+        listeners[i].apply(null, args);
       }
     }
   }
