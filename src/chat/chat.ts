@@ -10,6 +10,7 @@ module ChatModule {
     socket: SocketIOClient.Socket;
     messages: IMessage[] = [];
     user: IUser;
+    status: boolean;
 
     private _liveevent: Liveevent.ILiveevent;
 

@@ -170,6 +170,8 @@ module Liveevent {
 
       this.socket.on('liveEventStatus', (data) => {
 
+        this.chat.status = data.chatAvailable;
+
         // Liveevent is off
         if (!data.isActive) {
           console.log('[ Liveevent:Socket ] Liveevent is not active');

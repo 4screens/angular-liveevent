@@ -7,6 +7,7 @@ module ChatModule {
     theme?: ITheme;
     socket?: SocketIOClient.Socket;
     messages?: IMessage[];
+    status: boolean;
 
     init(): ng.IPromise<IChatResponse>;
   }
