@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.38
+ * 4screens-angular-liveevent v0.1.39
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -140,6 +140,7 @@ var Liveevent;
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
             });
             this.socket.on('liveEventStatus', function (data) {
+                _this.chat.status = data.chatAvailable;
                 // Liveevent is off
                 if (!data.isActive) {
                     console.log('[ Liveevent:Socket ] Liveevent is not active');
