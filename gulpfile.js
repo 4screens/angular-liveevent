@@ -34,9 +34,15 @@ var MAIN = 'liveevent.js';
 
 gulp.task('bump', function() {
   var bump = plugins.util.env.bump || false;
+  var incrementType = plugins.util.env.increment || 'patch';
+
+  // Read about bitwise operators.
+  if (!~['major', 'minor', 'patch'].indexOf(incrementType)) {
+    throw new Error('You must provide a versioning type: major, minor or patch. We love you anyway! <3');
+  }
 
   if (bump) {
-    pkg.version = semver.inc(pkg.version, 'patch');
+    pkg.version = semver.inc(pkg.version, incrementType);
   }
 
   return gulp.src(['./bower.json', './package.json'])
@@ -50,7 +56,7 @@ gulp.task('header', ['bump'], function() {
   return gulp.src(BANNER)
     .pipe(plugins.rename({extname: '.ts'}))
     .pipe(plugins.replace(/<%= pkg\.(\w+)\.?(\w+)? %>/g, function(chars, major, minor) {
-      return minor?pkg[major][minor]:pkg[major];
+      return minor ? pkg[major][minor] : pkg[major];
     }))
     .pipe(gulp.dest(PATH.source));
 });
