@@ -91,6 +91,8 @@ module Liveevent {
     private updateQuiz(EF) {
       this.currentEngageform = EF;
 
+      this.event.trigger('now::changed', EF);
+
       console.log('[ Liveevent ] Update Quiz: ' + this.currentEngageform._engageformId);
 
       if (!this.currentEngageform.navigation.truePick) {
