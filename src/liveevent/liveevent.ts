@@ -206,7 +206,7 @@ module Liveevent {
           }
 
           this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: this.sendAnswerCallback }}).then((res) => {
-            this.currentEngageform = res;
+            this.updateQuiz(res);
           });
 
           // Page is off
