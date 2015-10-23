@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.39
+ * 4screens-angular-liveevent v0.1.40
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -74,6 +74,7 @@ var Liveevent;
         };
         Liveevent.prototype.updateQuiz = function (EF) {
             this.currentEngageform = EF;
+            this.event.trigger('now::changed', EF);
             console.log('[ Liveevent ] Update Quiz: ' + this.currentEngageform._engageformId);
             if (!this.currentEngageform.navigation.truePick) {
                 this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
@@ -166,7 +167,7 @@ var Liveevent;
                         return;
                     }
                     _this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: _this.sendAnswerCallback } }).then(function (res) {
-                        _this.currentEngageform = res;
+                        _this.updateQuiz(res);
                     });
                     // Page is off
                     if (!data.activeQuestionId) {
