@@ -30,6 +30,26 @@ class Extension {
 
     Extension.io = <SocketIOClientStatic>opts.io;
 
+    switch (opts.mode) {
+      case 'summary':
+        Extension.mode = opts.engageform.Mode.Summary;
+        break;
+      case 'default':
+      case '':
+      case undefined:
+        Extension.mode = opts.engageform.Mode.Default;
+        break;
+      default:
+        return Extension.$q.reject({
+          status: 'error',
+          error: {
+            code: 406,
+            message: 'Mode property not supported.'
+          },
+          data: opts
+        });
+    };
+
     var liveEvent = new Liveevent.Liveevent();
 
     if (!opts.callback) {
