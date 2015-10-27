@@ -46,8 +46,8 @@ module ChatModule {
       this._liveevent = liveevent;
 
       // Feature status handlers
-      this.registerUpdateMessageHandler('featured', featuredMessageNotify);
       this.registerUpdateMessageHandler('featured', updateFeaturedStatus);
+      this.registerUpdateMessageHandler('featured', featuredMessageNotify);
     }
 
     private login(data: IFbAuth, dataMe: any) { // FIXME: dateMe FB interface (v2.3 or 2.2) ?
@@ -132,8 +132,9 @@ module ChatModule {
       _.forOwn(newData, (value, field) => {
         // When the value is different than it was before and there are handlers defined, call them.
         if (value !== message[field] && _.isArray(this.updateMessageHandlers[field])) {
+          var oldValue = message[field];
           _.forEach(this.updateMessageHandlers[field], (handler) => {
-            handler.call(this, message[field], value, message);
+            handler.call(this, oldValue, value, message);
           })
         }
       });
