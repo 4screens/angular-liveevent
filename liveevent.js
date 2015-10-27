@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.41
+ * 4screens-angular-liveevent v0.1.42
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -16,6 +16,31 @@ var Liveevent;
             console.log('[ Liveevent ] Constructor');
             this.event = new Util.Event();
         }
+        Liveevent.prototype.summaryStatsUnification = function (data) {
+            var result = {};
+            result.questionId = data._id;
+            if (data.type === 'rateIt') {
+                result.avg = data.stats.avg;
+                return result;
+            }
+            _.each(data.answers, function (answer) {
+                result[answer._id] = answer.percent;
+            });
+            return result;
+        };
+        ;
+        Liveevent.prototype.getAnswersForSummary = function () {
+            var _this = this;
+            var url = Extension.config.backend.domain + Extension.config.engageform.presentationViewStats;
+            url = url.replace(':questionId', this.activePageId);
+            return Extension.$http.get(url).then(function (res) {
+                if ([200, 304].indexOf(res.status) !== -1) {
+                    return _this.summaryStatsUnification(res.data);
+                }
+                return Extension.$q.reject(res);
+            });
+        };
+        ;
         Liveevent.prototype.updatePage = function (page) {
             var _this = this;
             console.log('[ Liveevent ] Update Page: ' + page._id, this.currentEngageform.navigation);
@@ -59,6 +84,12 @@ var Liveevent;
                     _this.currentEngageform.message = 'Answers are currently not accepting';
                 }
             };
+            if (Extension.mode === this.EF.Mode.Summary && this.currentEngageform.current && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
+                this.getAnswersForSummary().then(function (answersData) {
+                    _this.currentEngageform.current.updateAnswers(answersData);
+                });
+                this.currentEngageform.liveSettings.showAnswers = true;
+            }
         };
         Liveevent.prototype.removePage = function () {
             var _this = this;
@@ -287,13 +318,36 @@ var Liveevent;
 /// <reference path="ichat.ts" />
 var ChatModule;
 (function (ChatModule) {
+    function featuredMessageNotify(oldValue, newValue, message) {
+        this._liveevent.event.trigger('chat::messageFeatureStatusChanged', this._liveevent.id, message, newValue);
+        return message;
+    }
+    function updateFeaturedStatus(oldValue, newValue, message) {
+        message.featured = newValue;
+        return message;
+    }
     var Chat = (function () {
         function Chat(id, liveevent) {
             this.messages = [];
+            this.updateMessageHandlers = {};
             console.log('[ Chat ] Constructor');
             this.id = id;
             this._liveevent = liveevent;
+            // Feature status handlers
+            this.registerUpdateMessageHandler('featured', updateFeaturedStatus);
+            this.registerUpdateMessageHandler('featured', featuredMessageNotify);
         }
+        /**
+         * Registers handlers that will be invoked and will potentially modify the message on its data update.
+         * @param field
+         * @param handler
+         */
+        Chat.prototype.registerUpdateMessageHandler = function (field, handler) {
+            if (!this.updateMessageHandlers[field]) {
+                this.updateMessageHandlers[field] = [];
+            }
+            this.updateMessageHandlers[field].push(handler);
+        };
         Chat.prototype.login = function (data, dataMe) {
             this.user = {
                 accessToken: data.accessToken,
@@ -355,6 +409,25 @@ var ChatModule;
                 });
             });
         };
+        /**
+         * Handles updates of a message data, delegating data to handler functions.
+         * @param message
+         * @param newData
+         * @returns {IMessage}
+         */
+        Chat.prototype.handleNewMessageData = function (message, newData) {
+            var _this = this;
+            _.forOwn(newData, function (value, field) {
+                // When the value is different than it was before and there are handlers defined, call them.
+                if (value !== message[field] && _.isArray(_this.updateMessageHandlers[field])) {
+                    var oldValue = message[field];
+                    _.forEach(_this.updateMessageHandlers[field], function (handler) {
+                        handler.call(_this, oldValue, value, message);
+                    });
+                }
+            });
+            return message;
+        };
         Chat.prototype.initSocket = function () {
             var _this = this;
             console.log('[ Chat:Socket ] Init socket');
@@ -372,15 +445,24 @@ var ChatModule;
             // New msg event
             this.socket.on('msg', function (data) {
                 console.log('[ Chat:Socket ] New msg');
-                _this._liveevent.event.trigger('chat::message', _this._liveevent.id, data);
+                // "msg" event is triggered not only when new message arrives, but also a message changes.
+                var existingMsg = _.find(_this.messages, 'id', data.id);
                 Extension.$rootScope.$apply(function () {
-                    if (_this.direction && _this.direction === 'ttb') {
-                        _this.messages.push(data);
+                    if (existingMsg) {
+                        _this.handleNewMessageData(existingMsg, data);
                     }
                     else {
-                        _this.messages.unshift(data);
+                        if (_this.direction && _this.direction === 'ttb') {
+                            _this.messages.push(data);
+                        }
+                        else {
+                            _this.messages.unshift(data);
+                        }
                     }
                 });
+                if (!existingMsg) {
+                    _this._liveevent.event.trigger('chat::message', _this._liveevent.id, data);
+                }
             });
             this.socket.on('msgHide', function (id) {
                 console.log('[ Chat:Socket] Hide msg');
@@ -432,6 +514,26 @@ var Extension = (function () {
             return Extension._instances[opts.id];
         }
         Extension.io = opts.io;
+        switch (opts.mode) {
+            case 'summary':
+                Extension.mode = opts.engageform.Mode.Summary;
+                break;
+            case 'default':
+            case '':
+            case undefined:
+                Extension.mode = opts.engageform.Mode.Default;
+                break;
+            default:
+                return Extension.$q.reject({
+                    status: 'error',
+                    error: {
+                        code: 406,
+                        message: 'Mode property not supported.'
+                    },
+                    data: opts
+                });
+        }
+        ;
         var liveEvent = new Liveevent.Liveevent();
         if (!opts.callback) {
             opts.callback = {
