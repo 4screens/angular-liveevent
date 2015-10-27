@@ -1,6 +1,16 @@
 /// <reference path="ichat.ts" />
 
 module ChatModule {
+  function featuredMessageNotify(oldValue, newValue, message) {
+    this._liveevent.event.trigger('chat::messageFeatureStatusChanged', this._liveevent.id, message, newValue);
+    return message;
+  }
+
+  function updateFeaturedStatus(oldValue, newValue, message) {
+    message.featured = newValue;
+    return message;
+  }
+
   export class Chat implements IChat {
     id: string;
     name: string;
@@ -14,11 +24,30 @@ module ChatModule {
 
     private _liveevent: Liveevent.ILiveevent;
 
+    private updateMessageHandlers = {};
+
+    /**
+     * Registers handlers that will be invoked and will potentially modify the message on its data update.
+     * @param field
+     * @param handler
+     */
+    private registerUpdateMessageHandler(field: string, handler: (oldValue: any, newValue: any, message: IMessage) => IMessage) {
+      if (!this.updateMessageHandlers[field]) {
+        this.updateMessageHandlers[field] = [];
+      }
+
+      this.updateMessageHandlers[field].push(handler);
+    }
+
     constructor(id: string, liveevent: Liveevent.ILiveevent) {
       console.log('[ Chat ] Constructor');
       this.id = id;
 
       this._liveevent = liveevent;
+
+      // Feature status handlers
+      this.registerUpdateMessageHandler('featured', updateFeaturedStatus);
+      this.registerUpdateMessageHandler('featured', featuredMessageNotify);
     }
 
     private login(data: IFbAuth, dataMe: any) { // FIXME: dateMe FB interface (v2.3 or 2.2) ?
@@ -93,6 +122,26 @@ module ChatModule {
       });
     }
 
+    /**
+     * Handles updates of a message data, delegating data to handler functions.
+     * @param message
+     * @param newData
+     * @returns {IMessage}
+     */
+    private handleNewMessageData(message: IMessage, newData: IMessage) {
+      _.forOwn(newData, (value, field) => {
+        // When the value is different than it was before and there are handlers defined, call them.
+        if (value !== message[field] && _.isArray(this.updateMessageHandlers[field])) {
+          var oldValue = message[field];
+          _.forEach(this.updateMessageHandlers[field], (handler) => {
+            handler.call(this, oldValue, value, message);
+          })
+        }
+      });
+
+      return message;
+    }
+
     private initSocket() {
       console.log('[ Chat:Socket ] Init socket');
 
@@ -116,15 +165,24 @@ module ChatModule {
       this.socket.on('msg', (data) => {
         console.log('[ Chat:Socket ] New msg');
 
-        this._liveevent.event.trigger('chat::message', this._liveevent.id, <IMessage>data);
-        Extension.$rootScope.$apply(() => {
-          if (this.direction && this.direction === 'ttb') {
-            this.messages.push(<IMessage>data);
-          } else {
-            this.messages.unshift(<IMessage>data);
-          }
+        // "msg" event is triggered not only when new message arrives, but also a message changes.
+        var existingMsg = _.find(this.messages, 'id', data.id);
 
-        })
+        Extension.$rootScope.$apply(() => {
+          if (existingMsg) {
+            this.handleNewMessageData(existingMsg, data);
+          } else {
+            if (this.direction && this.direction === 'ttb') {
+              this.messages.push(<IMessage>data);
+            } else {
+              this.messages.unshift(<IMessage>data);
+            }
+          }
+        });
+
+        if (!existingMsg) {
+          this._liveevent.event.trigger('chat::message', this._liveevent.id, <IMessage>data);
+        }
       });
 
       this.socket.on('msgHide', (id) => {

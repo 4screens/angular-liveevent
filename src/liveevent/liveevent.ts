@@ -24,6 +24,37 @@ module Liveevent {
       this.event = new Util.Event();
     }
 
+    private summaryStatsUnification(data) {
+      var result = {};
+
+      result.questionId = data._id;
+
+      if (data.type === 'rateIt') {
+        result.avg = data.stats.avg;
+
+        return result;
+      }
+
+      _.each(data.answers, function(answer) {
+        result[answer._id] = answer.percent;
+      });
+
+      return result;
+    };
+
+    private getAnswersForSummary(): ng.IPromise<any> {
+      var url = Extension.config.backend.domain + Extension.config.engageform.presentationViewStats;
+      url = url.replace(':questionId', this.activePageId);
+
+      return Extension.$http.get(url).then((res) => {
+        if ([200, 304].indexOf(res.status) !== -1) {
+          return this.summaryStatsUnification(res.data);
+        }
+
+        return Extension.$q.reject(res);
+      });
+    };
+
     private updatePage(page) {
       console.log('[ Liveevent ] Update Page: ' + page._id, this.currentEngageform.navigation);
 
@@ -73,6 +104,14 @@ module Liveevent {
           this.currentEngageform.message = 'Answers are currently not accepting';
         }
       };
+
+      if (Extension.mode === this.EF.Mode.Summary && this.currentEngageform.current && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
+        this.getAnswersForSummary().then((answersData) => {
+          this.currentEngageform.current.updateAnswers(answersData);
+        });
+
+        this.currentEngageform.liveSettings.showAnswers = true;
+      }
     }
 
     private removePage() {
