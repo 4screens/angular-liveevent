@@ -1,6 +1,6 @@
 (function(angular) {
 /*!
- * 4screens-angular-liveevent v0.1.42
+ * 4screens-angular-liveevent v0.1.43
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
@@ -446,7 +446,9 @@ var ChatModule;
             this.socket.on('msg', function (data) {
                 console.log('[ Chat:Socket ] New msg');
                 // "msg" event is triggered not only when new message arrives, but also a message changes.
-                var existingMsg = _.find(_this.messages, 'id', data.id);
+                var existingMsg = _.find(_this.messages, function (message) {
+                    return message.id === data.id;
+                });
                 Extension.$rootScope.$apply(function () {
                     if (existingMsg) {
                         _this.handleNewMessageData(existingMsg, data);
