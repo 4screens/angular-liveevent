@@ -166,7 +166,9 @@ module ChatModule {
         console.log('[ Chat:Socket ] New msg');
 
         // "msg" event is triggered not only when new message arrives, but also a message changes.
-        var existingMsg = _.find(this.messages, 'id', data.id);
+        var existingMsg = _.find(this.messages, function(message) {
+          return message.id === data.id;
+        });
 
         Extension.$rootScope.$apply(() => {
           if (existingMsg) {
