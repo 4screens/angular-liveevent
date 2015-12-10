@@ -104,7 +104,7 @@ module Liveevent {
         if (this.currentEngageform.liveSettings.acceptResponses) {
           this.currentEngageform.navigation.truePick(event, page, options);
         } else {
-          this.currentEngageform.message = 'Answers are currently not accepting';
+          this.currentEngageform.message = 'Answering is disabled at the moment.';
         }
       };
 
