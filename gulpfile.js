@@ -16,19 +16,7 @@ var PATH = {
   dist: 'release',
   source: 'src'
 };
-var FILES = [
-  path.join('.', PATH.source, 'header.ts'),
-
-  path.join('.', PATH.source, 'app.ts'),
-  path.join('.', PATH.source, 'bootstrap.ts'),
-  path.join('.', PATH.source, 'extend.ts'),
-
-  path.join('.', PATH.source, 'util', 'event.ts'),
-
-  path.join('.', PATH.source, 'liveevent', 'liveevent.ts'),
-
-  path.join('.', PATH.source, 'chat', 'chat.ts')
-];
+var FILES = PATH.source + '/**/*.ts';
 var BANNER = path.join('.', PATH.source, 'header.txt');
 var MAIN = 'liveevent.js';
 
@@ -66,7 +54,9 @@ gulp.task('build', ['header'], function() {
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.typescript({
       target: 'ES5',
-      declarationFiles: false
+
+      // Combine all modules.
+      out: 'output.js'
     }));
 
   return ts.js
