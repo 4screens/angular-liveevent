@@ -1,6 +1,11 @@
 /// <reference path="iliveevent.ts" />
 
 module Liveevent {
+  interface summaryStatData {
+    questionId: string;
+    avg: number;
+  }
+
   export class Liveevent implements ILiveevent {
     enabled: boolean;
     id :string;
@@ -14,18 +19,16 @@ module Liveevent {
     EF: Engageform.IEngageform;
     chat: ChatModule.IChat;
     currentEngageform: Engageform.IEngageform;
-    sendAnswerCallback: ISendAnswerCallback;
+    sendAnswerCallback: API.answerCallback;
 
     event: Util.Event;
 
     constructor() {
-      console.log('[ Liveevent ] Constructor');
-
       this.event = new Util.Event();
     }
 
-    private summaryStatsUnification(data) {
-      var result = {};
+    private summaryStatsUnification(data): summaryStatData {
+      var result = <summaryStatData>{};
 
       result.questionId = data._id;
 
@@ -35,7 +38,7 @@ module Liveevent {
         return result;
       }
 
-      _.each(data.answers, function(answer) {
+      _.each(data.answers, function(answer: {percent: number, _id: string}) {
         result[answer._id] = answer.percent;
       });
 
@@ -55,7 +58,7 @@ module Liveevent {
       });
     };
 
-    private updatePage(page) {
+    private updatePage(page: Page.IPage) {
       console.log('[ Liveevent ] Update Page: ' + page._id, this.currentEngageform.navigation);
 
       var __type = this.activePage ? (this.activePage.type + '') : null;
@@ -97,15 +100,16 @@ module Liveevent {
       }
 
       // Block pick if answers are not allowed
-      this.currentEngageform.navigation.pick = (e, n, r) => {
+      this.currentEngageform.navigation.pick = (event, page: Page.ICase, options?) => {
         if (this.currentEngageform.liveSettings.acceptResponses) {
-          this.currentEngageform.navigation.truePick(e, n, r);
+          this.currentEngageform.navigation.truePick(event, page, options);
         } else {
           this.currentEngageform.message = 'Answers are currently not accepting';
         }
       };
 
-      if (Extension.mode === this.EF.Mode.Summary && this.currentEngageform.current && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
+      if (Extension.mode === Engageform.Mode.Summary && this.currentEngageform.current
+        && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
         this.getAnswersForSummary().then((answersData) => {
           this.currentEngageform.current.updateAnswers(answersData);
         });
@@ -183,7 +187,7 @@ module Liveevent {
       console.log('[ Liveevent ] Init socket');
       var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
       url = url.replace(':liveEventId', opts.id);
-      this.socket = Extension.io.connect(url, { 'force new connection': true });
+      this.socket = Extension.io.connect(url, { forceNew: true });
 
       this.socket.on('connect', () => {
         console.log('[ Liveevent:Socket ] Connected');
@@ -269,14 +273,14 @@ module Liveevent {
                 this.updateQuiz(res);
 
               // Update Page
-              this.getPageById(data.activeQuestionId).then((page) => {
+              this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
                 this.updatePage(page);
               });
             });
           } else {
             // Only Page changed
             console.log('[ Liveevent:Socket ] Only Page changed');
-            this.getPageById(data.activeQuestionId).then((page) => {
+            this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
               this.updatePage(page);
             });
           }
@@ -317,7 +321,7 @@ module Liveevent {
       });
 
       // Buzzer listening
-      this.socket.on('buzzerQuestionStatus', (data) => {
+      this.socket.on('buzzerQuestionStatusCallback', (data) => {
 
         // Run callback
         if (opts.callback && opts.callback.buzzerQuestionStatus) {

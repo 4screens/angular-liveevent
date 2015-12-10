@@ -7,6 +7,7 @@ module Page {
   }
 
   export interface IPage {
+    _id?: string;
     id: string;
     engageform: Engageform.IEngageform;
 

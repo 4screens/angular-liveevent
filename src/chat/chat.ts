@@ -41,9 +41,7 @@ module ChatModule {
     }
 
     constructor(id: string, liveevent: Liveevent.ILiveevent) {
-      console.log('[ Chat ] Constructor');
       this.id = id;
-
       this._liveevent = liveevent;
 
       // Feature status handlers

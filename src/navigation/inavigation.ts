@@ -18,7 +18,13 @@ module Navigation {
 
     start($event): void;
     prev($event): void;
+
     pick($event, vcase: Page.ICase): void;
+    pick($event, vcase: Page.ICase, opts: {quiet?: boolean} ): void;
+
+    truePick($event, vcase: Page.ICase): void;
+    truePick($event, vcase: Page.ICase, opts: {quiet: boolean} ): void;
+
     next($event, vcase: Page.ICase): void;
     finish($event, vcase: Page.ICase): void;
   }
