@@ -38,6 +38,7 @@ module ChatModule {
     userLink: string;
     userName?: string;
     userId?: string;
+    userID?: string
   }
 
   export interface IFbAuth {

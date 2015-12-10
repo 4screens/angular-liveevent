@@ -1,6 +1,8 @@
-/// <reference path="api/api.ts" />
-/// <reference path="liveevent/liveevent.ts" />
-/// <reference path="chat/chat.ts" />
+/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="./engageform/enum.ts" />
+/// <reference path="./api/api.ts" />
+/// <reference path="./liveevent/liveevent.ts" />
+/// <reference path="./chat/chat.ts" />
 
 class Extension {
   static $http: ng.IHttpService;
@@ -10,6 +12,7 @@ class Extension {
   static $rootScope: ng.IRootScopeService;
   static config;
   static io: SocketIOClientStatic;
+  static mode: Engageform.Mode = Engageform.Mode.Undefined;
   Liveevent: Liveevent.ILiveevent;
 
   private static _instances: Liveevent.ILiveeventInstances = {};
@@ -32,12 +35,12 @@ class Extension {
 
     switch (opts.mode) {
       case 'summary':
-        Extension.mode = opts.engageform.Mode.Summary;
+        Extension.mode = Engageform.Mode.Summary;
         break;
       case 'default':
       case '':
       case undefined:
-        Extension.mode = opts.engageform.Mode.Default;
+        Extension.mode = Engageform.Mode.Default;
         break;
       default:
         return Extension.$q.reject({
@@ -48,7 +51,7 @@ class Extension {
           },
           data: opts
         });
-    };
+    }
 
     var liveEvent = new Liveevent.Liveevent();
 

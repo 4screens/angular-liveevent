@@ -1,4 +1,4 @@
-/// <reference path="ichat.ts" />
+/// <reference path="./ichat.ts" />
 
 module ChatModule {
   function featuredMessageNotify(oldValue, newValue, message) {
@@ -17,6 +17,7 @@ module ChatModule {
     premoderated: boolean;
     direction: string;
     theme: ITheme;
+
     socket: SocketIOClient.Socket;
     messages: IMessage[] = [];
     user: IUser;
@@ -147,7 +148,7 @@ module ChatModule {
 
       var url = Extension.config.backend.socket;
 
-      this.socket = Extension.io.connect(url, { 'force new connection': true });
+      this.socket = Extension.io.connect(url, { forceNew: true });
 
       this.socket.on('error', (res) => {
         console.warn(res);

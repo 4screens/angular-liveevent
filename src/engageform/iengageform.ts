@@ -8,6 +8,8 @@ module Engageform {
     branding: Branding.IBranding;
     tabs: ITabs;
 
+    Mode: Engageform.Mode;
+
     current: Page.IPage;
     message: string;
     navigation: Navigation.INavigation;
