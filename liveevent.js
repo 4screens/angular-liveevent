@@ -1,19 +1,32 @@
 (function(angular) {
-/*!
- * 4screens-angular-liveevent v0.1.43
- * (c) 2015 Nopattern sp. z o.o.
- * License: proprietary
- */
-
 /// <reference path="../typings/tsd.d.ts" />
 var app = angular.module('4screens.liveevent', ['LocalStorageModule']);
-
+var Engageform;
+(function (Engageform) {
+    (function (Type) {
+        Type[Type["Undefined"] = 0] = "Undefined";
+        Type[Type["Live"] = 1] = "Live";
+        Type[Type["Outcome"] = 2] = "Outcome";
+        Type[Type["Poll"] = 3] = "Poll";
+        Type[Type["Score"] = 4] = "Score";
+        Type[Type["Survey"] = 5] = "Survey";
+    })(Engageform.Type || (Engageform.Type = {}));
+    var Type = Engageform.Type;
+    (function (Mode) {
+        Mode[Mode["Undefined"] = 0] = "Undefined";
+        Mode[Mode["Default"] = 1] = "Default";
+        Mode[Mode["Preview"] = 2] = "Preview";
+        Mode[Mode["Result"] = 3] = "Result";
+        Mode[Mode["Summary"] = 4] = "Summary";
+    })(Engageform.Mode || (Engageform.Mode = {}));
+    var Mode = Engageform.Mode;
+})(Engageform || (Engageform = {}));
+/// <reference path="iliveevent.ts" />
 /// <reference path="iliveevent.ts" />
 var Liveevent;
 (function (Liveevent_1) {
     var Liveevent = (function () {
         function Liveevent() {
-            console.log('[ Liveevent ] Constructor');
             this.event = new Util.Event();
         }
         Liveevent.prototype.summaryStatsUnification = function (data) {
@@ -76,15 +89,16 @@ var Liveevent;
                 this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
             }
             // Block pick if answers are not allowed
-            this.currentEngageform.navigation.pick = function (e, n, r) {
+            this.currentEngageform.navigation.pick = function (event, page, options) {
                 if (_this.currentEngageform.liveSettings.acceptResponses) {
-                    _this.currentEngageform.navigation.truePick(e, n, r);
+                    _this.currentEngageform.navigation.truePick(event, page, options);
                 }
                 else {
-                    _this.currentEngageform.message = 'Answers are currently not accepting';
+                    _this.currentEngageform.message = 'Answering is disabled at the moment.';
                 }
             };
-            if (Extension.mode === this.EF.Mode.Summary && this.currentEngageform.current && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
+            if (Extension.mode === Engageform.Mode.Summary && this.currentEngageform.current
+                && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
                 this.getAnswersForSummary().then(function (answersData) {
                     _this.currentEngageform.current.updateAnswers(answersData);
                 });
@@ -152,7 +166,7 @@ var Liveevent;
             console.log('[ Liveevent ] Init socket');
             var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
             url = url.replace(':liveEventId', opts.id);
-            this.socket = Extension.io.connect(url, { 'force new connection': true });
+            this.socket = Extension.io.connect(url, { forceNew: true });
             this.socket.on('connect', function () {
                 console.log('[ Liveevent:Socket ] Connected');
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
@@ -259,7 +273,7 @@ var Liveevent;
                 _this.currentEngageform.current.updateAnswers(data);
             });
             // Buzzer listening
-            this.socket.on('buzzerQuestionStatus', function (data) {
+            this.socket.on('buzzerQuestionStatusCallback', function (data) {
                 // Run callback
                 if (opts.callback && opts.callback.buzzerQuestionStatus) {
                     data.id = opts.id;
@@ -314,8 +328,7 @@ var Liveevent;
     })();
     Liveevent_1.Liveevent = Liveevent;
 })(Liveevent || (Liveevent = {}));
-
-/// <reference path="ichat.ts" />
+/// <reference path="./ichat.ts" />
 var ChatModule;
 (function (ChatModule) {
     function featuredMessageNotify(oldValue, newValue, message) {
@@ -330,7 +343,6 @@ var ChatModule;
         function Chat(id, liveevent) {
             this.messages = [];
             this.updateMessageHandlers = {};
-            console.log('[ Chat ] Constructor');
             this.id = id;
             this._liveevent = liveevent;
             // Feature status handlers
@@ -432,7 +444,7 @@ var ChatModule;
             var _this = this;
             console.log('[ Chat:Socket ] Init socket');
             var url = Extension.config.backend.socket;
-            this.socket = Extension.io.connect(url, { 'force new connection': true });
+            this.socket = Extension.io.connect(url, { forceNew: true });
             this.socket.on('error', function (res) {
                 console.warn(res);
             });
@@ -498,10 +510,11 @@ var ChatModule;
     })();
     ChatModule.Chat = Chat;
 })(ChatModule || (ChatModule = {}));
-
-/// <reference path="api/api.ts" />
-/// <reference path="liveevent/liveevent.ts" />
-/// <reference path="chat/chat.ts" />
+/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="./engageform/enum.ts" />
+/// <reference path="./api/api.ts" />
+/// <reference path="./liveevent/liveevent.ts" />
+/// <reference path="./chat/chat.ts" />
 var Extension = (function () {
     function Extension($http, $q, $timeout, localStorage, $rootScope, ApiConfig) {
         Extension.$http = $http;
@@ -518,12 +531,12 @@ var Extension = (function () {
         Extension.io = opts.io;
         switch (opts.mode) {
             case 'summary':
-                Extension.mode = opts.engageform.Mode.Summary;
+                Extension.mode = Engageform.Mode.Summary;
                 break;
             case 'default':
             case '':
             case undefined:
-                Extension.mode = opts.engageform.Mode.Default;
+                Extension.mode = Engageform.Mode.Default;
                 break;
             default:
                 return Extension.$q.reject({
@@ -535,7 +548,6 @@ var Extension = (function () {
                     data: opts
                 });
         }
-        ;
         var liveEvent = new Liveevent.Liveevent();
         if (!opts.callback) {
             opts.callback = {
@@ -547,12 +559,41 @@ var Extension = (function () {
         }
         return Extension._instances[opts.id] = liveEvent.init(opts);
     };
+    Extension.mode = Engageform.Mode.Undefined;
     Extension._instances = {};
     return Extension;
 })();
 Extension.$inject = ['$http', '$q', '$timeout', 'localStorageService', '$rootScope', 'ApiConfig'];
 app.service('Liveevent', Extension);
-
+/// <reference path="../branding/ibranding.ts" />
+var Page;
+(function (Page) {
+    (function (CaseType) {
+        CaseType[CaseType["Undefined"] = 0] = "Undefined";
+        CaseType[CaseType["Image"] = 1] = "Image";
+        CaseType[CaseType["Input"] = 2] = "Input";
+        CaseType[CaseType["Iteration"] = 3] = "Iteration";
+        CaseType[CaseType["Text"] = 4] = "Text";
+    })(Page.CaseType || (Page.CaseType = {}));
+    var CaseType = Page.CaseType;
+    (function (Type) {
+        Type[Type["Undefined"] = 0] = "Undefined";
+        Type[Type["EndPage"] = 1] = "EndPage";
+        Type[Type["Form"] = 2] = "Form";
+        Type[Type["MultiChoice"] = 3] = "MultiChoice";
+        Type[Type["PictureChoice"] = 4] = "PictureChoice";
+        Type[Type["Rateit"] = 5] = "Rateit";
+        Type[Type["StartPage"] = 6] = "StartPage";
+        Type[Type["Buzzer"] = 7] = "Buzzer";
+        Type[Type["Poster"] = 8] = "Poster";
+    })(Page.Type || (Page.Type = {}));
+    var Type = Page.Type;
+})(Page || (Page = {}));
+var Page;
+(function (Page) {
+    ;
+})(Page || (Page = {}));
+///<reference path="../page/ipage.ts"/>
 /// <reference path="api/iembed.ts" />
 /// <reference path="api/iquizquestion.ts" />
 /// <reference path="api/iquizquestionsres.ts" />
@@ -575,7 +616,11 @@ app.service('Liveevent', Extension);
 /// <reference path="engageform/itabs.ts" />
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
-
+/*!
+ * 4screens-angular-liveevent v0.1.44
+ * (c) 2015 Nopattern sp. z o.o.
+ * License: proprietary
+ */
 var Util;
 (function (Util) {
     var Event = (function () {
