@@ -273,7 +273,7 @@ var Liveevent;
                 _this.currentEngageform.current.updateAnswers(data);
             });
             // Buzzer listening
-            this.socket.on('buzzerQuestionStatusCallback', function (data) {
+            this.socket.on('buzzerQuestionStatus', function (data) {
                 // Run callback
                 if (opts.callback && opts.callback.buzzerQuestionStatus) {
                     data.id = opts.id;
@@ -617,7 +617,7 @@ var Page;
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 /*!
- * 4screens-angular-liveevent v0.1.44
+ * 4screens-angular-liveevent v0.1.45
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
