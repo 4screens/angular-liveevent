@@ -321,7 +321,7 @@ module Liveevent {
       });
 
       // Buzzer listening
-      this.socket.on('buzzerQuestionStatusCallback', (data) => {
+      this.socket.on('buzzerQuestionStatus', (data) => {
 
         // Run callback
         if (opts.callback && opts.callback.buzzerQuestionStatus) {
