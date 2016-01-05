@@ -215,12 +215,12 @@ module Liveevent {
       }
 
       // Change the current form settings if applies.
-      if (this.currentEngageform) {
-        Extension.$timeout(() => {
+      Extension.$timeout(() => {
+        if (this.currentEngageform) {
           this.currentEngageform.liveSettings.showAnswers = data.showAnswers;
           this.currentEngageform.liveSettings.acceptResponses = data.acceptResponses;
-        });
-      }
+        }
+      });
 
       // Run the callback.
       if (opts.callback && opts.callback.liveEventStatus) {
