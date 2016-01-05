@@ -119,7 +119,6 @@ module Liveevent {
     }
 
     private removePage() {
-      console.log('[ Liveevent ] Remove page');
       Extension.$timeout(() => {
         this.activePage = null;
         this.activePageId = null;
@@ -136,8 +135,6 @@ module Liveevent {
 
       this.event.trigger('now::changed', EF);
 
-      console.log('[ Liveevent ] Update Quiz: ' + this.currentEngageform._engageformId);
-
       if (!this.currentEngageform.navigation.truePick) {
         this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
       }
@@ -147,7 +144,6 @@ module Liveevent {
     }
 
     private removeQuiz() {
-      console.log('[ Liveevent ] Remove quiz');
       Extension.$timeout(() => {
         this.activeQuiz = null;
         this.activeQuizId = null;
@@ -164,6 +160,8 @@ module Liveevent {
           this.currentEngageform.type = null;
         }
       });
+
+      this.removePage();
     }
 
     // Init chat
@@ -182,15 +180,69 @@ module Liveevent {
       }
     }
 
+	  /**
+     * Handler of the "liveEventStatus" socket event that manages the active quiz and page.
+     * @param data Data from the event.
+     * @param {API.ILiveEmbed} opts Options provided in the initSocket method.
+     */
+    liveStatusEventHandler(data, opts: API.ILiveEmbed) {
+      // If the quiz is not active or there's no active quiz, run the deactivation process.
+      if (!data.isActive || !data.activeQuizId) {
+        this.removeQuiz();
+
+      // No questions provided in the data? Deactivate the page.
+      } else if (!data.activeQuestionId) {
+        this.removePage();
+
+      // Quiz changed, so initialise another form.
+      } else if (data.activeQuizId !== this.activeQuizId) {
+        this.EF.init({
+          id: data.activeQuizId,
+          mode: 'default',
+          callback: { sendAnswerCallback: this.sendAnswerCallback }
+        }).then((res) => {
+          this.updateQuiz(res);
+          this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
+            this.updatePage(page);
+          });
+        });
+
+      // Question changed, so go to another page.
+      } else if (data.activeQuestionId !== this.activePageId) {
+        this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
+          this.updatePage(page);
+        });
+      }
+
+      // Change the current form settings if applies.
+      if (this.currentEngageform) {
+        Extension.$timeout(() => {
+          this.currentEngageform.liveSettings.showAnswers = data.showAnswers;
+          this.currentEngageform.liveSettings.acceptResponses = data.acceptResponses;
+        });
+      }
+
+      // Run the callback.
+      if (opts.callback && opts.callback.liveEventStatus) {
+        data.id = opts.id;
+        opts.callback.liveEventStatus(data);
+      }
+    }
+
     // Sockets
     private initSocket(opts: API.ILiveEmbed) {
-      console.log('[ Liveevent ] Init socket');
       var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
       url = url.replace(':liveEventId', opts.id);
+
+      // Create callback object if not provided.
+      opts.callback = opts.callback || {};
+
+      // Connect to the socket.
       this.socket = Extension.io.connect(url, { forceNew: true });
 
+      this.socket.on('liveEventStatus', data => { this.liveStatusEventHandler(data, opts); });
+
       this.socket.on('connect', () => {
-        console.log('[ Liveevent:Socket ] Connected');
         this.socket.emit('getStatus', { liveEventId: opts.id });
       });
 
@@ -209,107 +261,7 @@ module Liveevent {
       });
 
       this.socket.on('reconnect', () => {
-        console.log('[ Liveevent:Socket ] Reconnect');
         this.socket.emit('getStatus', { liveEventId: opts.id });
-      });
-
-      this.socket.on('liveEventStatus', (data) => {
-
-        this.chat.status = data.chatAvailable;
-
-        // Liveevent is off
-        if (!data.isActive) {
-          console.log('[ Liveevent:Socket ] Liveevent is not active');
-          this.removePage();
-          this.removeQuiz();
-
-          // Run callback
-          if (opts.callback && opts.callback.liveEventStatus) {
-            data.id = opts.id;
-            opts.callback.liveEventStatus(data);
-          }
-
-          return;
-        }
-
-        if (data.activeQuestionId !== this.activePageId || data.activeQuizId !== this.activeQuizId) {
-
-          // Quiz is off
-          if (!data.activeQuizId) {
-            console.log('[ Liveevent ] Quiz is empty');
-            this.removeQuiz();
-
-            // Run callback
-            if (opts.callback && opts.callback.liveEventStatus) {
-              data.id = opts.id;
-              opts.callback.liveEventStatus(data);
-            }
-
-            return;
-          }
-
-          this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: this.sendAnswerCallback }}).then((res) => {
-            this.updateQuiz(res);
-          });
-
-          // Page is off
-          if (!data.activeQuestionId) {
-              console.log('[ Liveevent ] Page is empty');
-            this.removePage();
-
-            // Run callback
-            if (opts.callback && opts.callback.liveEventStatus) {
-              data.id = opts.id;
-              opts.callback.liveEventStatus(data);
-            }
-
-            return;
-          }
-
-          // Quiz changed
-          if (data.activeQuizId !== this.activeQuizId) {
-            console.log('[ Liveevent:Socket ] Quiz changed');
-            this.EF.init({ id: data.activeQuizId, mode: 'default', callback: { sendAnswerCallback: this.sendAnswerCallback } }).then((res) => {
-                this.updateQuiz(res);
-
-              // Update Page
-              this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
-                this.updatePage(page);
-              });
-            });
-          } else {
-            // Only Page changed
-            console.log('[ Liveevent:Socket ] Only Page changed');
-            this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
-              this.updatePage(page);
-            });
-          }
-        }
-
-        // Quiz and page is same, check if showAnswers or acceptResponses had change
-        if (this.currentEngageform) {
-          if (data.showAnswers !== this.currentEngageform.liveSettings.showAnswers) {
-            console.log('[ Liveevent ] Show answer option changed');
-
-            Extension.$timeout(() => {
-              this.currentEngageform.liveSettings.showAnswers = data.showAnswers;
-            });
-          }
-          if (data.acceptResponses !== this.currentEngageform.liveSettings.acceptResponses) {
-            console.log('[ Liveevent ] Accept responses option changed');
-
-            Extension.$timeout(() => {
-              this.currentEngageform.liveSettings.acceptResponses = data.acceptResponses;
-              this.currentEngageform.message = '';
-            });
-          }
-        }
-
-        // Run callback
-        if (opts.callback && opts.callback.liveEventStatus) {
-          data.id = opts.id;
-          opts.callback.liveEventStatus(data);
-        }
       });
 
       this.socket.on('rateItQuestionStatus', (data) => {
@@ -322,9 +274,8 @@ module Liveevent {
 
       // Buzzer listening
       this.socket.on('buzzerQuestionStatus', (data) => {
-
         // Run callback
-        if (opts.callback && opts.callback.buzzerQuestionStatus) {
+        if (opts.callback.buzzerQuestionStatus) {
           data.id = opts.id;
           opts.callback.buzzerQuestionStatus(data);
         }
