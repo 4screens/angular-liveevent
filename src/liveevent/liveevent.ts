@@ -117,7 +117,7 @@ module Liveevent {
     }
 
     private removePage() {
-      Extension.$timeout(() => {
+      return Extension.$timeout(() => {
         this.activePage = null;
         this.activePageId = null;
 
@@ -142,24 +142,26 @@ module Liveevent {
     }
 
     private removeQuiz() {
-      Extension.$timeout(() => {
-        this.activeQuiz = null;
-        this.activeQuizId = null;
-        this.currentEngageform = null;
+      return this.removePage().then(() => {
+        return Extension.$timeout(() => {
+          this.activeQuiz = null;
+          this.activeQuizId = null;
 
-        if (this.currentEngageform) {
-          this.currentEngageform.branding = null;
-          this.currentEngageform.current = null;
-          this.currentEngageform.message = null;
-          this.currentEngageform.meta = null;
-          this.currentEngageform.navigation = null;
-          this.currentEngageform.theme = null;
-          this.currentEngageform.title = null;
-          this.currentEngageform.type = null;
-        }
+          if (this.currentEngageform) {
+            this.currentEngageform.branding = null;
+            this.currentEngageform.current = null;
+            this.currentEngageform.message = null;
+            this.currentEngageform.meta = null;
+            this.currentEngageform.navigation = null;
+            this.currentEngageform.theme = null;
+            this.currentEngageform.title = null;
+            this.currentEngageform.type = null;
+          }
+
+          this.currentEngageform = null;
+        });
       });
 
-      this.removePage();
     }
 
     // Init chat
