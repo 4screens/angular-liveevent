@@ -64,7 +64,6 @@ module ChatModule {
     }
 
     private updateChat(data) {
-      console.log('[ Chat ] Update chat');
       this.id = data.id;
       this.name = data.name;
       this.premoderated = data.premoderated;
@@ -76,8 +75,6 @@ module ChatModule {
     }
 
     private sendMsg(m: IMessage) {
-      console.log('[ Chat ] Posting msg');
-
       if (!this.user) return;
 
       var url = Extension.config.backend.domain + Extension.config.chat.sendUrl, msg;
@@ -98,11 +95,9 @@ module ChatModule {
     }
 
     private getMsgs() {
-      console.log('[ Chat ] Get old msgs');
       var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl;
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
-        //console.log('[ Chat ] Got ' + res.data.length + ' msgs');
         this.messages = <IMessage[]>res.data;
 
         if (this.messages.length) {
@@ -142,8 +137,6 @@ module ChatModule {
     }
 
     private initSocket() {
-      console.log('[ Chat:Socket ] Init socket');
-
       var url = Extension.config.backend.socket;
 
       this.socket = Extension.io.connect(url, { forceNew: true });
@@ -153,8 +146,6 @@ module ChatModule {
       });
 
       this.socket.on('connect', (data) => {
-        console.log('[ Chat:Socket ] Connected');
-
         // Join room
         this.socket.emit('joinRoom', this.id);
         // We can also leave room, to do so just emit 'leaveRoom' with roomId as param
@@ -162,8 +153,6 @@ module ChatModule {
 
       // New msg event
       this.socket.on('msg', (data) => {
-        console.log('[ Chat:Socket ] New msg');
-
         // "msg" event is triggered not only when new message arrives, but also a message changes.
         var existingMsg = _.find(this.messages, function(message) {
           return message.id === data.id;
@@ -187,8 +176,6 @@ module ChatModule {
       });
 
       this.socket.on('msgHide', (id) => {
-        console.log('[ Chat:Socket] Hide msg');
-
         this._liveevent.event.trigger('chat::hideMessage', id);
 
         var messageIndex = this.messages.length;
@@ -209,8 +196,6 @@ module ChatModule {
     }
 
     init():ng.IPromise<IChatResponse> {
-      console.log('[ Chat ] Init: ' + this.id);
-
       // Get chat details
       var url = Extension.config.backend.domain + Extension.config.chat.detailUrl;
       url = url.replace(':chatId', this.id);

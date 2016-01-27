@@ -59,8 +59,6 @@ module Liveevent {
     };
 
     private updatePage(page: Page.IPage) {
-      console.log('[ Liveevent ] Update Page: ' + page._id, this.currentEngageform.navigation);
-
       var __type = this.activePage ? (this.activePage.type + '') : null;
 
       // Check if form and if so, send all inputs
@@ -305,7 +303,6 @@ module Liveevent {
       return Extension.$http.get(url).then(function(res) {
 
         if ([200, 304].indexOf(res.status) !== -1) {
-          console.log('[ Liveevent ] Get PAGE: ' + res.data['_id']);
           return res.data;
         }
 
@@ -314,7 +311,6 @@ module Liveevent {
     }
 
     init(opts: API.ILiveEmbed) {
-      console.log('[ Liveevent ] Init: ' + opts.id);
       var deferred = Extension.$q.defer();
 
       this.id = opts.id;

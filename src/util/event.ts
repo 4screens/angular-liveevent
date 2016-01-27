@@ -23,8 +23,6 @@ module Util {
      * @param {Function} callback
      */
     listen(event: string, callback: any): void {
-      console.log('[ Util:Event ] listen', event);
-
       if (!this._listener[event]) {
         this._listener[event] = [];
       }
@@ -39,8 +37,6 @@ module Util {
      * @param {Function} callback
        */
     unsubscribe(event: string, callback?: any): void {
-      console.log('[ Util:Event ] unsubscribe', event);
-
       if (this._listener[event]) {
         if (!callback) {
           this._listener[event].length = 0;
@@ -57,8 +53,6 @@ module Util {
      * @param {args...} data
      */
     trigger(event: string, ...data: any[]): void {
-      console.log('[ Util:Event ] trigger', event);
-
       var args = Array.apply(null, arguments).slice(1);
       var listeners = this._listener[event];
 
