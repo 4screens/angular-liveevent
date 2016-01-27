@@ -197,6 +197,7 @@ module Liveevent {
         this.EF.init({
           id: data.activeQuizId,
           mode: 'default',
+          live: true,
           callback: { sendAnswerCallback: this.sendAnswerCallback }
         }).then((res) => {
           this.updateQuiz(res);
