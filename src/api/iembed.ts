@@ -8,6 +8,7 @@ module API {
       liveEventStatus?: liveEventStatusCallback;
       buzzerQuestionStatus?: buzzerQuestionStatusCallback;
     };
+    embedSettings: IEmbedSettings;
   }
 
   export interface answerCallback {

@@ -21,6 +21,9 @@ module Liveevent {
     currentEngageform: Engageform.IEngageform;
     sendAnswerCallback: API.answerCallback;
 
+    // Embed settings are stored on the instance since it's needed much after the initialisation.
+    embedSettings: API.IEmbedSettings;
+
     event: Util.Event;
 
     constructor() {
@@ -200,7 +203,8 @@ module Liveevent {
           id: data.activeQuizId,
           mode: 'default',
           live: true,
-          callback: { sendAnswerCallback: this.sendAnswerCallback }
+          callback: {sendAnswerCallback: this.sendAnswerCallback},
+          embedSettings: this.embedSettings
         }).then((res) => {
           this.updateQuiz(res);
           this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
@@ -316,6 +320,7 @@ module Liveevent {
     init(opts: API.ILiveEmbed) {
       var deferred = Extension.$q.defer();
 
+      this.embedSettings = opts.embedSettings;
       this.id = opts.id;
       this.EF = opts.engageform;
       this.sendAnswerCallback = opts.callback.sendAnswerCallback;
