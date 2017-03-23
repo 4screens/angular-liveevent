@@ -8,7 +8,7 @@ module Liveevent {
 
   export class Liveevent implements ILiveevent {
     enabled: boolean;
-    id :string;
+    id: string;
     title: string;
 
     activePage: Page.IPage;
@@ -41,7 +41,7 @@ module Liveevent {
         return result;
       }
 
-      _.each(data.answers, function(answer: {percent: number, _id: string}) {
+      _.each(data.answers, function (answer: { percent: number, _id: string }) {
         result[answer._id] = answer.percent;
       });
 
@@ -91,10 +91,18 @@ module Liveevent {
       this.currentEngageform.navigation.hasFinish = false;
       this.currentEngageform.navigation.enabledFinish = false;
       this.currentEngageform.navigation.distance = 0;
-      this.currentEngageform.navigation.prev = ($event) => { return; };
-      this.currentEngageform.navigation.next = ($event, vcase: Page.ICase) => { return; };
-      this.currentEngageform.navigation.start = ($event) => { return; };
-      this.currentEngageform.navigation.finish = ($event, vcase: Page.ICase) => { return; };
+      this.currentEngageform.navigation.prev = ($event) => {
+        return;
+      };
+      this.currentEngageform.navigation.next = ($event, vcase: Page.ICase) => {
+        return;
+      };
+      this.currentEngageform.navigation.start = ($event) => {
+        return;
+      };
+      this.currentEngageform.navigation.finish = ($event, vcase: Page.ICase) => {
+        return;
+      };
 
       if (!this.currentEngageform.navigation.truePick) {
         this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
@@ -183,7 +191,7 @@ module Liveevent {
       }
     }
 
-	  /**
+    /**
      * Handler of the "liveEventStatus" socket event that manages the active quiz and page.
      * @param data Data from the event.
      * @param {API.ILiveEmbed} opts Options provided in the initSocket method.
@@ -193,11 +201,11 @@ module Liveevent {
       if (!data.isActive || !data.activeQuizId) {
         this.removeQuiz();
 
-      // No questions provided in the data? Deactivate the page.
+        // No questions provided in the data? Deactivate the page.
       } else if (!data.activeQuestionId) {
         this.removePage();
 
-      // Quiz changed, so initialise another form.
+        // Quiz changed, so initialise another form.
       } else if (data.activeQuizId !== this.activeQuizId) {
         this.EF.init({
           id: data.activeQuizId,
@@ -212,7 +220,7 @@ module Liveevent {
           });
         });
 
-      // Question changed, so go to another page.
+        // Question changed, so go to another page.
       } else if (data.activeQuestionId !== this.activePageId) {
         this.getPageById(data.activeQuestionId).then((page: Page.IPage) => {
           this.updatePage(page);
@@ -243,12 +251,14 @@ module Liveevent {
       opts.callback = opts.callback || {};
 
       // Connect to the socket.
-      this.socket = Extension.io.connect(url, { forceNew: true });
+      this.socket = Extension.io.connect(url, {forceNew: true});
 
-      this.socket.on('liveEventStatus', data => { this.liveStatusEventHandler(data, opts); });
+      this.socket.on('liveEventStatus', data => {
+        this.liveStatusEventHandler(data, opts);
+      });
 
       this.socket.on('connect', () => {
-        this.socket.emit('getStatus', { liveEventId: opts.id });
+        this.socket.emit('getStatus', {liveEventId: opts.id});
       });
 
       this.socket.on('disconnect', this.initSocket);
@@ -266,7 +276,7 @@ module Liveevent {
       });
 
       this.socket.on('reconnect', () => {
-        this.socket.emit('getStatus', { liveEventId: opts.id });
+        this.socket.emit('getStatus', {liveEventId: opts.id});
       });
 
       this.socket.on('rateItQuestionStatus', (data) => {
@@ -307,13 +317,13 @@ module Liveevent {
       var url = Extension.config.backend.domain + Extension.config.liveEvent.activeQuestion;
       url = url.replace(':questionId', questionId);
 
-      return Extension.$http.get(url).then(function(res) {
+      return Extension.$http.get(url).then(function (res) {
 
         if ([200, 304].indexOf(res.status) !== -1) {
           return res.data;
         }
 
-          this.$q.reject(res);
+        this.$q.reject(res);
       });
     }
 
