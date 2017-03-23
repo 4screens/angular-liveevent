@@ -80,10 +80,18 @@ var Liveevent;
             this.currentEngageform.navigation.hasFinish = false;
             this.currentEngageform.navigation.enabledFinish = false;
             this.currentEngageform.navigation.distance = 0;
-            this.currentEngageform.navigation.prev = function ($event) { return; };
-            this.currentEngageform.navigation.next = function ($event, vcase) { return; };
-            this.currentEngageform.navigation.start = function ($event) { return; };
-            this.currentEngageform.navigation.finish = function ($event, vcase) { return; };
+            this.currentEngageform.navigation.prev = function ($event) {
+                return;
+            };
+            this.currentEngageform.navigation.next = function ($event, vcase) {
+                return;
+            };
+            this.currentEngageform.navigation.start = function ($event) {
+                return;
+            };
+            this.currentEngageform.navigation.finish = function ($event, vcase) {
+                return;
+            };
             if (!this.currentEngageform.navigation.truePick) {
                 this.currentEngageform.navigation.truePick = this.currentEngageform.navigation.pick;
             }
@@ -159,10 +167,10 @@ var Liveevent;
             }
         };
         /**
-       * Handler of the "liveEventStatus" socket event that manages the active quiz and page.
-       * @param data Data from the event.
-       * @param {API.ILiveEmbed} opts Options provided in the initSocket method.
-       */
+         * Handler of the "liveEventStatus" socket event that manages the active quiz and page.
+         * @param data Data from the event.
+         * @param {API.ILiveEmbed} opts Options provided in the initSocket method.
+         */
         Liveevent.prototype.liveStatusEventHandler = function (data, opts) {
             var _this = this;
             // If the quiz is not active or there's no active quiz, run the deactivation process.
@@ -177,7 +185,8 @@ var Liveevent;
                     id: data.activeQuizId,
                     mode: 'default',
                     live: true,
-                    callback: { sendAnswerCallback: this.sendAnswerCallback }
+                    callback: { sendAnswerCallback: this.sendAnswerCallback },
+                    embedSettings: this.embedSettings
                 }).then(function (res) {
                     _this.updateQuiz(res);
                     _this.getPageById(data.activeQuestionId).then(function (page) {
@@ -212,7 +221,9 @@ var Liveevent;
             opts.callback = opts.callback || {};
             // Connect to the socket.
             this.socket = Extension.io.connect(url, { forceNew: true });
-            this.socket.on('liveEventStatus', function (data) { _this.liveStatusEventHandler(data, opts); });
+            this.socket.on('liveEventStatus', function (data) {
+                _this.liveStatusEventHandler(data, opts);
+            });
             this.socket.on('connect', function () {
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
             });
@@ -270,6 +281,7 @@ var Liveevent;
         Liveevent.prototype.init = function (opts) {
             var _this = this;
             var deferred = Extension.$q.defer();
+            this.embedSettings = opts.embedSettings;
             this.id = opts.id;
             this.EF = opts.engageform;
             this.sendAnswerCallback = opts.callback.sendAnswerCallback;
