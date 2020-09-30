@@ -372,9 +372,9 @@ var ChatModule;
             };
             return Extension.$http.post(url, msg);
         };
-        Chat.prototype.getMsgs = function () {
+        Chat.prototype.getMsgs = function (eventId) {
             var _this = this;
-            var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl;
+            var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl + '?count=100&eventId=' + eventId;
             url = url.replace(':chatId', this.id);
             return Extension.$http.get(url).then(function (res) {
                 _this.messages = res.data;
