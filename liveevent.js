@@ -354,7 +354,7 @@ var ChatModule;
             // Get some old msgs
             this.getMsgs();
         };
-        Chat.prototype.sendMsg = function (m) {
+        Chat.prototype.sendMsg = function (m, eventId) {
             if (!this.user)
                 return;
             var url = Extension.config.backend.domain + Extension.config.chat.sendUrl, msg;
@@ -363,6 +363,7 @@ var ChatModule;
                 accessToken: this.user.accessToken,
                 date: Date.now(),
                 hidden: false,
+                eventId: eventId,
                 id: this.user.userId,
                 msg: m,
                 user: this.user.user,
