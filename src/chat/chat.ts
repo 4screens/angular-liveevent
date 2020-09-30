@@ -96,7 +96,7 @@ module ChatModule {
     }
 
     private getMsgs() {
-      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl+'?count=100&eventId='+this._liveevent.EF._engageformId
+      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl+'?count=100&eventId='+this._liveevent.activeQuiz._engageformId
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
         this.messages = <IMessage[]>res.data;
