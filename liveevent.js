@@ -352,7 +352,12 @@ var ChatModule;
             this.direction = data.chatDirection;
             this.theme = data.theme;
             // Get some old msgs
-            this.getMsgs();
+            if (this._liveevent.activeQuiz) {
+                this.getMsgs();
+            }
+            else {
+                this.messages = [];
+            }
         };
         Chat.prototype.sendMsg = function (m) {
             if (!this.user)
