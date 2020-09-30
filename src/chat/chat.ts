@@ -74,7 +74,7 @@ module ChatModule {
       this.getMsgs();
     }
 
-    private sendMsg(m: IMessage) {
+    private sendMsg(m: IMessage, eventId: string) {
       if (!this.user) return;
 
       var url = Extension.config.backend.domain + Extension.config.chat.sendUrl, msg;
@@ -84,6 +84,7 @@ module ChatModule {
         accessToken: this.user.accessToken,
         date: Date.now(),
         hidden: false,
+        eventId: eventId,
         id: this.user.userId,
         msg: m,
         user: this.user.user,
