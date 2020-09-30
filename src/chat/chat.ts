@@ -71,7 +71,13 @@ module ChatModule {
       this.theme = data.theme;
 
       // Get some old msgs
-      this.getMsgs();
+      if(this._liveevent.activeQuiz ){
+        this.getMsgs();
+      }else{
+        this.messages = <IMessage[]>[];
+      }
+
+
     }
 
     private sendMsg(m: IMessage) {
