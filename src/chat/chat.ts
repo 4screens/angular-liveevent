@@ -95,8 +95,8 @@ module ChatModule {
       return Extension.$http.post(url, msg);
     }
 
-    private getMsgs() {
-      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl;
+    private getMsgs(eventId: string) {
+      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl+'?count=100&eventId='+eventId;
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
         this.messages = <IMessage[]>res.data;
