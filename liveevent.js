@@ -363,7 +363,7 @@ var ChatModule;
                 accessToken: this.user.accessToken,
                 date: Date.now(),
                 hidden: false,
-                eventId: this._liveevent.EF._engageformId,
+                eventId: this._liveevent.activeQuiz._engageformId,
                 id: this.user.userId,
                 msg: m,
                 user: this.user.user,
