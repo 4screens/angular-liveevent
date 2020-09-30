@@ -74,7 +74,7 @@ module ChatModule {
       this.getMsgs();
     }
 
-    private sendMsg(m: IMessage, eventId: string) {
+    private sendMsg(m: IMessage) {
       if (!this.user) return;
 
       var url = Extension.config.backend.domain + Extension.config.chat.sendUrl, msg;
@@ -84,7 +84,7 @@ module ChatModule {
         accessToken: this.user.accessToken,
         date: Date.now(),
         hidden: false,
-        eventId: eventId,
+        eventId: this._liveevent.EF._engageformId,
         id: this.user.userId,
         msg: m,
         user: this.user.user,
@@ -95,8 +95,8 @@ module ChatModule {
       return Extension.$http.post(url, msg);
     }
 
-    private getMsgs(eventId: string) {
-      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl+'?count=100&eventId='+eventId;
+    private getMsgs() {
+      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl+'?count=100&eventId='+this._liveevent.EF._engageformId
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
         this.messages = <IMessage[]>res.data;
