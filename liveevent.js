@@ -354,7 +354,7 @@ var ChatModule;
             // Get some old msgs
             this.getMsgs();
         };
-        Chat.prototype.sendMsg = function (m, eventId) {
+        Chat.prototype.sendMsg = function (m) {
             if (!this.user)
                 return;
             var url = Extension.config.backend.domain + Extension.config.chat.sendUrl, msg;
@@ -363,7 +363,7 @@ var ChatModule;
                 accessToken: this.user.accessToken,
                 date: Date.now(),
                 hidden: false,
-                eventId: eventId,
+                eventId: this._liveevent.EF._engageformId,
                 id: this.user.userId,
                 msg: m,
                 user: this.user.user,
@@ -372,9 +372,9 @@ var ChatModule;
             };
             return Extension.$http.post(url, msg);
         };
-        Chat.prototype.getMsgs = function (eventId) {
+        Chat.prototype.getMsgs = function () {
             var _this = this;
-            var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl + '?count=100&eventId=' + eventId;
+            var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl + '?count=100&eventId=' + this._liveevent.EF._engageformId;
             url = url.replace(':chatId', this.id);
             return Extension.$http.get(url).then(function (res) {
                 _this.messages = res.data;
