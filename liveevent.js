@@ -374,7 +374,7 @@ var ChatModule;
         };
         Chat.prototype.getMsgs = function () {
             var _this = this;
-            var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl + '?count=100&eventId=' + this._liveevent.EF._engageformId;
+            var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl + '?count=100&eventId=' + this._liveevent.activeQuiz._engageformId;
             url = url.replace(':chatId', this.id);
             return Extension.$http.get(url).then(function (res) {
                 _this.messages = res.data;
