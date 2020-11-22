@@ -187,6 +187,11 @@ module ChatModule {
           return message.id === data.id;
         });
 
+        var existingUser = _.find(this.messages, function(message) {
+          return message.userName === data.userName;
+        });
+        data.avatarColor = existingUser ? existingUser.avatarColor : this.getRandomColor();
+
         Extension.$rootScope.$apply(() => {
           if (existingMsg) {
             this.handleNewMessageData(existingMsg, data);
