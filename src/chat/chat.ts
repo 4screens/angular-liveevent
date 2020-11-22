@@ -101,6 +101,15 @@ module ChatModule {
       return Extension.$http.post(url, msg);
     }
 
+    private getRandomColor() {
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
     private getMsgs() {
       var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl+'/100/'+this._liveevent.activeQuiz._engageformId
       url = url.replace(':chatId', this.id);
@@ -115,6 +124,19 @@ module ChatModule {
           if (this.direction && this.direction === 'ttb') {
             this.messages.reverse();
           }
+
+          // Generate colors for User Avatar
+          var colors: { [key:string]: string } = {};
+          this.messages = this.messages.map((msg: IMessage) => {
+            if (colors.hasOwnProperty(msg.userName)) {
+              msg.avatarColor = colors[msg.userName];
+            } else {
+              var color = this.getRandomColor();
+              colors[msg.userName] = color;
+              msg.avatarColor = color;
+            }
+            return msg;
+          });
         }
 
         _.forEach(this.messages, (message) => {

@@ -30,6 +30,7 @@ module ChatModule {
     user: string;
     userLink: string;
     userName?: string;
+    avatarColor?: string;
   }
 
   export interface IUser {
