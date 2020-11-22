@@ -377,6 +377,14 @@ var ChatModule;
             };
             return Extension.$http.post(url, msg);
         };
+        Chat.prototype.getRandomColor = function () {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        };
         Chat.prototype.getMsgs = function () {
             var _this = this;
             var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl + '/100/' + this._liveevent.activeQuiz._engageformId;
@@ -390,6 +398,19 @@ var ChatModule;
                     if (_this.direction && _this.direction === 'ttb') {
                         _this.messages.reverse();
                     }
+                    // Generate colors for User Avatar
+                    var colors = {};
+                    _this.messages = _this.messages.map(function (msg) {
+                        if (colors.hasOwnProperty(msg.userName)) {
+                            msg.avatarColor = colors[msg.userName];
+                        }
+                        else {
+                            var color = _this.getRandomColor();
+                            colors[msg.userName] = color;
+                            msg.avatarColor = color;
+                        }
+                        return msg;
+                    });
                 }
                 _.forEach(_this.messages, function (message) {
                     _this._liveevent.event.trigger('chat::message', _this._liveevent.id, message);
@@ -587,7 +608,7 @@ var Page;
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 /*!
- * 4screens-angular-liveevent v0.2.0
+ * 4screens-angular-liveevent v0.2.6
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
