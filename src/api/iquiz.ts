@@ -33,6 +33,7 @@ module API {
       backgroundImagePosition: string;
       buttonColor: string;
       font: string;
+      fontUrl: string;
       questionColor: string;
       customThemeCssFile: string;
       tabFontColor: string;

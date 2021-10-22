@@ -7,6 +7,7 @@ module API {
       sendAnswerCallback?: answerCallback;
       liveEventStatus?: liveEventStatusCallback;
       buzzerQuestionStatus?: buzzerQuestionStatusCallback;
+      activeUserCount?: activeUserCountCallback;
     };
     embedSettings: IEmbedSettings;
   }
@@ -20,6 +21,10 @@ module API {
   }
 
   export interface buzzerQuestionStatusCallback {
+    (data): void;
+  }
+
+  export interface activeUserCountCallback {
     (data): void;
   }
 }

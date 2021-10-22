@@ -295,6 +295,14 @@ module Liveevent {
           opts.callback.buzzerQuestionStatus(data);
         }
       });
+
+      // Active User Count listening
+      this.socket.on('activeUserCount', (data) => {
+        // Run callback
+        if (opts.callback.activeUserCount) {
+          opts.callback.activeUserCount(data);
+        }
+      });
     }
 
     // Get Liveevent
