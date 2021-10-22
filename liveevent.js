@@ -254,6 +254,13 @@ var Liveevent;
                     opts.callback.buzzerQuestionStatus(data);
                 }
             });
+            // Active User Count listening
+            this.socket.on('activeUserCount', function (data) {
+                // Run callback
+                if (opts.callback.activeUserCount) {
+                    opts.callback.activeUserCount(data);
+                }
+            });
         };
         // Get Liveevent
         Liveevent.prototype.getById = function (id) {
