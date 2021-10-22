@@ -619,7 +619,7 @@ var Page;
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 /*!
- * 4screens-angular-liveevent v0.2.6
+ * 4screens-angular-liveevent v0.2.7
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
