@@ -279,6 +279,10 @@ module Liveevent {
         this.socket.emit('getStatus', {liveEventId: opts.id});
       });
 
+      this.socket.on('displayType', (data) => {
+        this.socket.emit('now::displayType', data);
+      });
+
       this.socket.on('rateItQuestionStatus', (data) => {
         this.currentEngageform.current.updateAnswers(data);
       });
