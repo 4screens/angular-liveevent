@@ -241,7 +241,10 @@ var Liveevent;
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
             });
             this.socket.on('displayType', function (data) {
-                _this.socket.emit('now::displayType', data);
+                // Run callback
+                if (opts.callback.displayTypeUpdate) {
+                    opts.callback.displayTypeUpdate(data);
+                }
             });
             this.socket.on('rateItQuestionStatus', function (data) {
                 _this.currentEngageform.current.updateAnswers(data);
@@ -622,7 +625,7 @@ var Page;
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 /*!
- * 4screens-angular-liveevent v0.2.7
+ * 4screens-angular-liveevent v0.2.10
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
