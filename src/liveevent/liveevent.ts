@@ -280,7 +280,10 @@ module Liveevent {
       });
 
       this.socket.on('displayType', (data) => {
-        this.socket.emit('now::displayType', data);
+        // Run callback
+        if (opts.callback.displayTypeUpdate) {
+          opts.callback.displayTypeUpdate(data);
+        }
       });
 
       this.socket.on('rateItQuestionStatus', (data) => {
