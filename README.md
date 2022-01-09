@@ -7,16 +7,8 @@ Live event extension for 4screens angular client for engage form
 
 ## How to make a release
 
-* gulp release // just do a release
-* gulp release --bump // releases and bumps by patch.
-* gulp release --bump --increment="__TYPE__" // releases and bumps by __TYPE__ (major, minor and patch by default).
-
-
-###
-Alternative approach to make a release:
-
-1. npm i 
-2. gulp minify
+1. `npm i` 
+2. `gulp minify` or `gulp minify --bump`
 3. copy liveevent.js liveevent.js.map liveevent.min.js liveevent.min.js.map to ./build directory (create directory if needed)
 4. commit code changes into 'master' branch
 5. change to 'release' branch 
