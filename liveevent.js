@@ -227,7 +227,7 @@ var Liveevent;
             this.socket.on('connect', function () {
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
             });
-            this.socket.on('disconnect', this.initSocket(opts));
+            // this.socket.on('disconnect', this.initSocket(opts));
             this.socket.on('error', function (res) {
                 console.warn('[ Liveevent:Socket ] Error: ' + res);
             });
@@ -625,7 +625,7 @@ var Page;
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 /*!
- * 4screens-angular-liveevent v0.2.11
+ * 4screens-angular-liveevent v0.2.12
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
