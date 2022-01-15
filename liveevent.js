@@ -227,7 +227,7 @@ var Liveevent;
             this.socket.on('connect', function () {
                 _this.socket.emit('getStatus', { liveEventId: opts.id });
             });
-            // this.socket.on('disconnect', this.initSocket(opts));
+            this.socket.on('disconnect', this.initSocket(opts));
             this.socket.on('error', function (res) {
                 console.warn('[ Liveevent:Socket ] Error: ' + res);
             });
@@ -680,7 +680,9 @@ var Util;
                 return;
             }
             for (var i = 0; i < listeners.length; i++) {
-                listeners[i].apply(null, args);
+                if (listeners[i]) {
+                    listeners[i].apply(null, args);
+                }
             }
         };
         return Event;
