@@ -61,7 +61,9 @@ module Util {
       }
 
       for (var i=0; i<listeners.length; i++) {
-        listeners[i].apply(null, args);
+        if (listeners[i]) {
+          listeners[i].apply(null, args);
+        }
       }
     }
   }
