@@ -246,7 +246,7 @@ module Liveevent {
 
     // Sockets
     private initSocket(opts: API.ILiveEmbed) {
-      if (!this.globalOpts){
+      if (!this.globalOpts) {
         this.globalOpts = opts
       }
 
@@ -259,68 +259,73 @@ module Liveevent {
       this.globalOpts.callback = this.globalOpts.callback || {};
 
       // Connect to the socket.
-      this.socket = Extension.io.connect(url, {forceNew: true});
+      if (!this.socket) {
+        this.socket = Extension.io.connect(url, {forceNew: true});
 
-      this.socket.on('liveEventStatus', data => {
-        this.liveStatusEventHandler(data, this.globalOpts);
-      });
+        this.socket.on('liveEventStatus', data => {
+          this.liveStatusEventHandler(data, this.globalOpts);
+        });
 
+        this.socket.on('connect', () => {
+          this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
+        });
 
-      this.socket.on('connect', () => {
-        this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
-      });
+        this.socket.on('disconnect', () => {
+          this.initSocket(this.globalOpts)
+        });
 
-      this.socket.on('disconnect', () => {
-        // this.initSocket(this.globalOpts)
-      });
+        this.socket.on('error', (res) => {
+          console.warn('[ Liveevent:Socket ] Error: ' + res);
+        });
 
-      this.socket.on('error', (res) => {
-        console.warn('[ Liveevent:Socket ] Error: ' + res);
-      });
+        this.socket.on('reconnecting', () => {
+          console.warn('[ Liveevent:Socket ] Reconnecting');
+        });
 
-      this.socket.on('reconnecting', () => {
-        console.warn('[ Liveevent:Socket ] Reconnecting');
-      });
+        this.socket.on('reconnect_failed', () => {
+          console.warn('[ Liveevent:Socket ] Reconnect failed');
+        });
 
-      this.socket.on('reconnect_failed', () => {
-        console.warn('[ Liveevent:Socket ] Reconnect failed');
-      });
+        this.socket.on('reconnect', () => {
+          this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
+        });
 
-      this.socket.on('reconnect', () => {
-        this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
-      });
+        this.socket.on('displayType', (data) => {
+          // Run callback
+          if (this.globalOpts.callback.displayTypeUpdate) {
+            this.globalOpts.callback.displayTypeUpdate(data);
+          }
+        });
 
-      this.socket.on('displayType', (data) => {
-        // Run callback
-        if (this.globalOpts.callback.displayTypeUpdate) {
-          this.globalOpts.callback.displayTypeUpdate(data);
-        }
-      });
+        this.socket.on('rateItQuestionStatus', (data) => {
+          this.currentEngageform.current.updateAnswers(data);
+        });
 
-      this.socket.on('rateItQuestionStatus', (data) => {
-        this.currentEngageform.current.updateAnswers(data);
-      });
+        this.socket.on('multipleChoiceQuestionAnswers', (data) => {
+          this.currentEngageform.current.updateAnswers(data);
+        });
 
-      this.socket.on('multipleChoiceQuestionAnswers', (data) => {
-        this.currentEngageform.current.updateAnswers(data);
-      });
+        // Buzzer listening
+        this.socket.on('buzzerQuestionStatus', (data) => {
+          // Run callback
+          if (this.globalOpts.callback.buzzerQuestionStatus) {
+            data.id = opts.id;
+            this.globalOpts.callback.buzzerQuestionStatus(data);
+          }
+        });
 
-      // Buzzer listening
-      this.socket.on('buzzerQuestionStatus', (data) => {
-        // Run callback
-        if (this.globalOpts.callback.buzzerQuestionStatus) {
-          data.id = opts.id;
-          this.globalOpts.callback.buzzerQuestionStatus(data);
-        }
-      });
+        // Active User Count listening
+        this.socket.on('activeUserCount', (data) => {
+          // Run callback
+          if (this.globalOpts.callback.activeUserCount) {
+            this.globalOpts.callback.activeUserCount(data);
+          }
+        });
 
-      // Active User Count listening
-      this.socket.on('activeUserCount', (data) => {
-        // Run callback
-        if (this.globalOpts.callback.activeUserCount) {
-          this.globalOpts.callback.activeUserCount(data);
-        }
-      });
+      } else {
+        this.socket.socket.connect(url, {forceNew: true});
+      }
+
     }
 
     // Get Liveevent
