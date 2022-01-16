@@ -224,55 +224,60 @@ var Liveevent;
             // Create callback object if not provided.
             this.globalOpts.callback = this.globalOpts.callback || {};
             // Connect to the socket.
-            this.socket = Extension.io.connect(url, { forceNew: true });
-            this.socket.on('liveEventStatus', function (data) {
-                _this.liveStatusEventHandler(data, _this.globalOpts);
-            });
-            this.socket.on('connect', function () {
-                _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
-            });
-            this.socket.on('disconnect', function () {
-                // this.initSocket(this.globalOpts)
-            });
-            this.socket.on('error', function (res) {
-                console.warn('[ Liveevent:Socket ] Error: ' + res);
-            });
-            this.socket.on('reconnecting', function () {
-                console.warn('[ Liveevent:Socket ] Reconnecting');
-            });
-            this.socket.on('reconnect_failed', function () {
-                console.warn('[ Liveevent:Socket ] Reconnect failed');
-            });
-            this.socket.on('reconnect', function () {
-                _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
-            });
-            this.socket.on('displayType', function (data) {
-                // Run callback
-                if (_this.globalOpts.callback.displayTypeUpdate) {
-                    _this.globalOpts.callback.displayTypeUpdate(data);
-                }
-            });
-            this.socket.on('rateItQuestionStatus', function (data) {
-                _this.currentEngageform.current.updateAnswers(data);
-            });
-            this.socket.on('multipleChoiceQuestionAnswers', function (data) {
-                _this.currentEngageform.current.updateAnswers(data);
-            });
-            // Buzzer listening
-            this.socket.on('buzzerQuestionStatus', function (data) {
-                // Run callback
-                if (_this.globalOpts.callback.buzzerQuestionStatus) {
-                    data.id = opts.id;
-                    _this.globalOpts.callback.buzzerQuestionStatus(data);
-                }
-            });
-            // Active User Count listening
-            this.socket.on('activeUserCount', function (data) {
-                // Run callback
-                if (_this.globalOpts.callback.activeUserCount) {
-                    _this.globalOpts.callback.activeUserCount(data);
-                }
-            });
+            if (!this.socket) {
+                this.socket = Extension.io.connect(url, { forceNew: true });
+                this.socket.on('liveEventStatus', function (data) {
+                    _this.liveStatusEventHandler(data, _this.globalOpts);
+                });
+                this.socket.on('connect', function () {
+                    _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
+                });
+                this.socket.on('disconnect', function () {
+                    _this.initSocket(_this.globalOpts);
+                });
+                this.socket.on('error', function (res) {
+                    console.warn('[ Liveevent:Socket ] Error: ' + res);
+                });
+                this.socket.on('reconnecting', function () {
+                    console.warn('[ Liveevent:Socket ] Reconnecting');
+                });
+                this.socket.on('reconnect_failed', function () {
+                    console.warn('[ Liveevent:Socket ] Reconnect failed');
+                });
+                this.socket.on('reconnect', function () {
+                    _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
+                });
+                this.socket.on('displayType', function (data) {
+                    // Run callback
+                    if (_this.globalOpts.callback.displayTypeUpdate) {
+                        _this.globalOpts.callback.displayTypeUpdate(data);
+                    }
+                });
+                this.socket.on('rateItQuestionStatus', function (data) {
+                    _this.currentEngageform.current.updateAnswers(data);
+                });
+                this.socket.on('multipleChoiceQuestionAnswers', function (data) {
+                    _this.currentEngageform.current.updateAnswers(data);
+                });
+                // Buzzer listening
+                this.socket.on('buzzerQuestionStatus', function (data) {
+                    // Run callback
+                    if (_this.globalOpts.callback.buzzerQuestionStatus) {
+                        data.id = opts.id;
+                        _this.globalOpts.callback.buzzerQuestionStatus(data);
+                    }
+                });
+                // Active User Count listening
+                this.socket.on('activeUserCount', function (data) {
+                    // Run callback
+                    if (_this.globalOpts.callback.activeUserCount) {
+                        _this.globalOpts.callback.activeUserCount(data);
+                    }
+                });
+            }
+            else {
+                this.socket.socket.connect(url, { forceNew: true });
+            }
         };
         // Get Liveevent
         Liveevent.prototype.getById = function (id) {
