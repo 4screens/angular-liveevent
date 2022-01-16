@@ -276,7 +276,7 @@ var Liveevent;
                 });
             }
             else {
-                this.socket.socket.connect(url, { forceNew: true });
+                this.socket.socket.connect();
             }
         };
         // Get Liveevent
