@@ -232,7 +232,7 @@ var Liveevent;
                 _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
             });
             this.socket.on('disconnect', function () {
-                _this.initSocket(_this.globalOpts);
+                // this.initSocket(this.globalOpts)
             });
             this.socket.on('error', function (res) {
                 console.warn('[ Liveevent:Socket ] Error: ' + res);
