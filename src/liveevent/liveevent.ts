@@ -265,12 +265,13 @@ module Liveevent {
         this.liveStatusEventHandler(data, this.globalOpts);
       });
 
+
       this.socket.on('connect', () => {
         this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
       });
 
       this.socket.on('disconnect', () => {
-        this.initSocket(this.globalOpts)
+        // this.initSocket(this.globalOpts)
       });
 
       this.socket.on('error', (res) => {
