@@ -263,7 +263,9 @@ module Liveevent {
         this.socket.emit('getStatus', {liveEventId: opts.id});
       });
 
-      this.socket.on('disconnect', this.initSocket);
+      this.socket.on('disconnect', () => {
+        this.initSocket(opts)
+      });
 
       this.socket.on('error', (res) => {
         console.warn('[ Liveevent:Socket ] Error: ' + res);
