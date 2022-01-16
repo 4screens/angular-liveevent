@@ -59,7 +59,7 @@ module ChatModule {
       };
     }
 
-    private logout():void {
+    private logout(): void {
       this.user = null;
     }
 
@@ -71,9 +71,9 @@ module ChatModule {
       this.theme = data.theme;
 
       // Get some old msgs
-      if(this._liveevent.activeQuiz ){
+      if (this._liveevent.activeQuiz) {
         this.getMsgs();
-      }else{
+      } else {
         this.messages = <IMessage[]>[];
       }
 
@@ -111,7 +111,7 @@ module ChatModule {
     }
 
     private getMsgs() {
-      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl+'/100/'+this._liveevent.activeQuiz._engageformId
+      var url = Extension.config.backend.domain + Extension.config.chat.messagesUrl + '/100/' + this._liveevent.activeQuiz._engageformId
       url = url.replace(':chatId', this.id);
       return Extension.$http.get(url).then((res) => {
         this.messages = <IMessage[]>res.data;
@@ -126,7 +126,7 @@ module ChatModule {
           }
 
           // Generate colors for User Avatar
-          var colors: { [key:string]: string } = {};
+          var colors: { [key: string]: string } = {};
           this.messages = this.messages.map((msg: IMessage) => {
             if (colors.hasOwnProperty(msg.userName)) {
               msg.avatarColor = colors[msg.userName];
@@ -168,66 +168,76 @@ module ChatModule {
     private initSocket() {
       var url = Extension.config.backend.socket;
 
-      this.socket = Extension.io.connect(url, { forceNew: true });
 
-      this.socket.on('error', (res) => {
-        console.warn(res);
-      });
+      if (!this.socket) {
+        this.socket = Extension.io.connect(url, {forceNew: true});
 
-      this.socket.on('connect', (data) => {
-        // Join room
-        this.socket.emit('joinRoom', this.id);
-        // We can also leave room, to do so just emit 'leaveRoom' with roomId as param
-      });
-
-      // New msg event
-      this.socket.on('msg', (data) => {
-        // "msg" event is triggered not only when new message arrives, but also a message changes.
-        var existingMsg = _.find(this.messages, function(message) {
-          return message.id === data.id;
+        this.socket.on('error', (res) => {
+          console.warn(res);
         });
 
-        var existingUser = _.find(this.messages, function(message) {
-          return message.userName === data.userName;
+        this.socket.on('connect', (data) => {
+          // Join room
+          this.socket.emit('joinRoom', this.id);
+          // We can also leave room, to do so just emit 'leaveRoom' with roomId as param
         });
-        data.avatarColor = existingUser ? existingUser.avatarColor : this.getRandomColor();
 
-        Extension.$rootScope.$apply(() => {
-          if (existingMsg) {
-            this.handleNewMessageData(existingMsg, data);
-          } else {
-            if (this.direction && this.direction === 'ttb') {
-              this.messages.push(<IMessage>data);
+        // New msg event
+        this.socket.on('msg', (data) => {
+          // "msg" event is triggered not only when new message arrives, but also a message changes.
+          var existingMsg = _.find(this.messages, function (message) {
+            return message.id === data.id;
+          });
+
+          var existingUser = _.find(this.messages, function (message) {
+            return message.userName === data.userName;
+          });
+          data.avatarColor = existingUser ? existingUser.avatarColor : this.getRandomColor();
+
+          Extension.$rootScope.$apply(() => {
+            if (existingMsg) {
+              this.handleNewMessageData(existingMsg, data);
             } else {
-              this.messages.unshift(<IMessage>data);
+              if (this.direction && this.direction === 'ttb') {
+                this.messages.push(<IMessage>data);
+              } else {
+                this.messages.unshift(<IMessage>data);
+              }
+            }
+          });
+
+          if (!existingMsg) {
+            this._liveevent.event.trigger('chat::message', this._liveevent.id, <IMessage>data);
+          }
+        });
+
+        this.socket.on('msgHide', (id) => {
+          this._liveevent.event.trigger('chat::hideMessage', id);
+
+          var messageIndex = this.messages.length;
+
+          for (var i = 0; i < this.messages.length; i += 1) {
+            if (this.messages[i].id === id) {
+              messageIndex = i;
             }
           }
+
+          Extension.$rootScope.$apply(() => {
+            this.messages.splice(messageIndex, 1);
+          });
         });
 
-        if (!existingMsg) {
-          this._liveevent.event.trigger('chat::message', this._liveevent.id, <IMessage>data);
-        }
-      });
-
-      this.socket.on('msgHide', (id) => {
-        this._liveevent.event.trigger('chat::hideMessage', id);
-
-        var messageIndex = this.messages.length;
-
-        for (var i = 0; i < this.messages.length; i += 1) {
-          if (this.messages[i].id === id) {
-            messageIndex = i;
-          }
-        }
-
-        Extension.$rootScope.$apply(() => {
-          this.messages.splice(messageIndex, 1);
+        // On disconect
+        this.socket.on('disconnect', () => {
+          this.initSocket()
         });
-      });
 
-      // On disconect
-      this.socket.on('disconnect', this.initSocket);
+      } else {
+        this.socket.io.connect()
+      }
+
     }
+
 
     init():ng.IPromise<IChatResponse> {
       // Get chat details

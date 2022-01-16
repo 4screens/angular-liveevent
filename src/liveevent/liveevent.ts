@@ -323,7 +323,7 @@ module Liveevent {
         });
 
       } else {
-        this.socket.socket.connect();
+        this.socket.io.connect(url, {forceNew: true});
       }
 
     }
