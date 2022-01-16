@@ -217,6 +217,7 @@ var Liveevent;
             var _this = this;
             var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
             url = url.replace(':liveEventId', opts.id);
+            console.log('initSocket  url:', url);
             // Create callback object if not provided.
             opts.callback = opts.callback || {};
             // Connect to the socket.
