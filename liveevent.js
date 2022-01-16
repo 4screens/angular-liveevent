@@ -276,7 +276,7 @@ var Liveevent;
                 });
             }
             else {
-                this.socket.socket.connect();
+                this.socket.io.connect(url, { forceNew: true });
             }
         };
         // Get Liveevent
@@ -463,56 +463,63 @@ var ChatModule;
         Chat.prototype.initSocket = function () {
             var _this = this;
             var url = Extension.config.backend.socket;
-            this.socket = Extension.io.connect(url, { forceNew: true });
-            this.socket.on('error', function (res) {
-                console.warn(res);
-            });
-            this.socket.on('connect', function (data) {
-                // Join room
-                _this.socket.emit('joinRoom', _this.id);
-                // We can also leave room, to do so just emit 'leaveRoom' with roomId as param
-            });
-            // New msg event
-            this.socket.on('msg', function (data) {
-                // "msg" event is triggered not only when new message arrives, but also a message changes.
-                var existingMsg = _.find(_this.messages, function (message) {
-                    return message.id === data.id;
+            if (!this.socket) {
+                this.socket = Extension.io.connect(url, { forceNew: true });
+                this.socket.on('error', function (res) {
+                    console.warn(res);
                 });
-                var existingUser = _.find(_this.messages, function (message) {
-                    return message.userName === data.userName;
+                this.socket.on('connect', function (data) {
+                    // Join room
+                    _this.socket.emit('joinRoom', _this.id);
+                    // We can also leave room, to do so just emit 'leaveRoom' with roomId as param
                 });
-                data.avatarColor = existingUser ? existingUser.avatarColor : _this.getRandomColor();
-                Extension.$rootScope.$apply(function () {
-                    if (existingMsg) {
-                        _this.handleNewMessageData(existingMsg, data);
-                    }
-                    else {
-                        if (_this.direction && _this.direction === 'ttb') {
-                            _this.messages.push(data);
+                // New msg event
+                this.socket.on('msg', function (data) {
+                    // "msg" event is triggered not only when new message arrives, but also a message changes.
+                    var existingMsg = _.find(_this.messages, function (message) {
+                        return message.id === data.id;
+                    });
+                    var existingUser = _.find(_this.messages, function (message) {
+                        return message.userName === data.userName;
+                    });
+                    data.avatarColor = existingUser ? existingUser.avatarColor : _this.getRandomColor();
+                    Extension.$rootScope.$apply(function () {
+                        if (existingMsg) {
+                            _this.handleNewMessageData(existingMsg, data);
                         }
                         else {
-                            _this.messages.unshift(data);
+                            if (_this.direction && _this.direction === 'ttb') {
+                                _this.messages.push(data);
+                            }
+                            else {
+                                _this.messages.unshift(data);
+                            }
+                        }
+                    });
+                    if (!existingMsg) {
+                        _this._liveevent.event.trigger('chat::message', _this._liveevent.id, data);
+                    }
+                });
+                this.socket.on('msgHide', function (id) {
+                    _this._liveevent.event.trigger('chat::hideMessage', id);
+                    var messageIndex = _this.messages.length;
+                    for (var i = 0; i < _this.messages.length; i += 1) {
+                        if (_this.messages[i].id === id) {
+                            messageIndex = i;
                         }
                     }
+                    Extension.$rootScope.$apply(function () {
+                        _this.messages.splice(messageIndex, 1);
+                    });
                 });
-                if (!existingMsg) {
-                    _this._liveevent.event.trigger('chat::message', _this._liveevent.id, data);
-                }
-            });
-            this.socket.on('msgHide', function (id) {
-                _this._liveevent.event.trigger('chat::hideMessage', id);
-                var messageIndex = _this.messages.length;
-                for (var i = 0; i < _this.messages.length; i += 1) {
-                    if (_this.messages[i].id === id) {
-                        messageIndex = i;
-                    }
-                }
-                Extension.$rootScope.$apply(function () {
-                    _this.messages.splice(messageIndex, 1);
+                // On disconect
+                this.socket.on('disconnect', function () {
+                    _this.initSocket();
                 });
-            });
-            // On disconect
-            this.socket.on('disconnect', this.initSocket);
+            }
+            else {
+                this.socket.io.connect();
+            }
         };
         Chat.prototype.init = function () {
             var _this = this;
