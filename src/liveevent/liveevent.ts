@@ -26,6 +26,8 @@ module Liveevent {
 
     event: Util.Event;
 
+    globalOpts: API.ILiveevent
+
     constructor() {
       this.event = new Util.Event();
     }
@@ -244,27 +246,31 @@ module Liveevent {
 
     // Sockets
     private initSocket(opts: API.ILiveEmbed) {
+      if (!this.globalOpts){
+        this.globalOpts = opts
+      }
+
       var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
-      url = url.replace(':liveEventId', opts.id);
+      url = url.replace(':liveEventId', this.globalOpts.id);
 
       console.log('initSocket  url:', url)
 
       // Create callback object if not provided.
-      opts.callback = opts.callback || {};
+      this.globalOpts.callback = this.globalOpts.callback || {};
 
       // Connect to the socket.
       this.socket = Extension.io.connect(url, {forceNew: true});
 
       this.socket.on('liveEventStatus', data => {
-        this.liveStatusEventHandler(data, opts);
+        this.liveStatusEventHandler(data, this.globalOpts);
       });
 
       this.socket.on('connect', () => {
-        this.socket.emit('getStatus', {liveEventId: opts.id});
+        this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
       });
 
       this.socket.on('disconnect', () => {
-        this.initSocket(opts)
+        this.initSocket(this.globalOpts)
       });
 
       this.socket.on('error', (res) => {
@@ -280,13 +286,13 @@ module Liveevent {
       });
 
       this.socket.on('reconnect', () => {
-        this.socket.emit('getStatus', {liveEventId: opts.id});
+        this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
       });
 
       this.socket.on('displayType', (data) => {
         // Run callback
-        if (opts.callback.displayTypeUpdate) {
-          opts.callback.displayTypeUpdate(data);
+        if (this.globalOpts.callback.displayTypeUpdate) {
+          this.globalOpts.callback.displayTypeUpdate(data);
         }
       });
 
@@ -301,17 +307,17 @@ module Liveevent {
       // Buzzer listening
       this.socket.on('buzzerQuestionStatus', (data) => {
         // Run callback
-        if (opts.callback.buzzerQuestionStatus) {
+        if (this.globalOpts.callback.buzzerQuestionStatus) {
           data.id = opts.id;
-          opts.callback.buzzerQuestionStatus(data);
+          this.globalOpts.callback.buzzerQuestionStatus(data);
         }
       });
 
       // Active User Count listening
       this.socket.on('activeUserCount', (data) => {
         // Run callback
-        if (opts.callback.activeUserCount) {
-          opts.callback.activeUserCount(data);
+        if (this.globalOpts.callback.activeUserCount) {
+          this.globalOpts.callback.activeUserCount(data);
         }
       });
     }
