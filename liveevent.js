@@ -215,21 +215,24 @@ var Liveevent;
         // Sockets
         Liveevent.prototype.initSocket = function (opts) {
             var _this = this;
+            if (!this.globalOpts) {
+                this.globalOpts = opts;
+            }
             var url = Extension.config.backend.socket + Extension.config.liveEvent.socketNamespace;
-            url = url.replace(':liveEventId', opts.id);
+            url = url.replace(':liveEventId', this.globalOpts.id);
             console.log('initSocket  url:', url);
             // Create callback object if not provided.
-            opts.callback = opts.callback || {};
+            this.globalOpts.callback = this.globalOpts.callback || {};
             // Connect to the socket.
             this.socket = Extension.io.connect(url, { forceNew: true });
             this.socket.on('liveEventStatus', function (data) {
-                _this.liveStatusEventHandler(data, opts);
+                _this.liveStatusEventHandler(data, _this.globalOpts);
             });
             this.socket.on('connect', function () {
-                _this.socket.emit('getStatus', { liveEventId: opts.id });
+                _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
             });
             this.socket.on('disconnect', function () {
-                _this.initSocket(opts);
+                _this.initSocket(_this.globalOpts);
             });
             this.socket.on('error', function (res) {
                 console.warn('[ Liveevent:Socket ] Error: ' + res);
@@ -241,12 +244,12 @@ var Liveevent;
                 console.warn('[ Liveevent:Socket ] Reconnect failed');
             });
             this.socket.on('reconnect', function () {
-                _this.socket.emit('getStatus', { liveEventId: opts.id });
+                _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
             });
             this.socket.on('displayType', function (data) {
                 // Run callback
-                if (opts.callback.displayTypeUpdate) {
-                    opts.callback.displayTypeUpdate(data);
+                if (_this.globalOpts.callback.displayTypeUpdate) {
+                    _this.globalOpts.callback.displayTypeUpdate(data);
                 }
             });
             this.socket.on('rateItQuestionStatus', function (data) {
@@ -258,16 +261,16 @@ var Liveevent;
             // Buzzer listening
             this.socket.on('buzzerQuestionStatus', function (data) {
                 // Run callback
-                if (opts.callback.buzzerQuestionStatus) {
+                if (_this.globalOpts.callback.buzzerQuestionStatus) {
                     data.id = opts.id;
-                    opts.callback.buzzerQuestionStatus(data);
+                    _this.globalOpts.callback.buzzerQuestionStatus(data);
                 }
             });
             // Active User Count listening
             this.socket.on('activeUserCount', function (data) {
                 // Run callback
-                if (opts.callback.activeUserCount) {
-                    opts.callback.activeUserCount(data);
+                if (_this.globalOpts.callback.activeUserCount) {
+                    _this.globalOpts.callback.activeUserCount(data);
                 }
             });
         };
