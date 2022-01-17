@@ -261,6 +261,9 @@ module Liveevent {
       // Connect to the socket.
       if (!this.socket) {
         this.socket = Extension.io.connect(url, {forceNew: true});
+      } else {
+        this.socket.io.connect(url, {forceNew: true});
+      }
 
         this.socket.on('liveEventStatus', data => {
           this.liveStatusEventHandler(data, this.globalOpts);
@@ -321,10 +324,6 @@ module Liveevent {
             this.globalOpts.callback.activeUserCount(data);
           }
         });
-
-      } else {
-        this.socket.io.connect(url, {forceNew: true});
-      }
 
     }
 
