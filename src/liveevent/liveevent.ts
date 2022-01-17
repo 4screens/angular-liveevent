@@ -262,7 +262,7 @@ module Liveevent {
       if (!this.socket) {
         this.socket = Extension.io.connect(url, {forceNew: true});
       } else {
-        this.socket.io.connect(url, {forceNew: true});
+        this.socket.socket.connect();
       }
 
         this.socket.on('liveEventStatus', data => {
@@ -273,9 +273,9 @@ module Liveevent {
           this.socket.emit('getStatus', {liveEventId: this.globalOpts.id});
         });
 
-        this.socket.on('disconnect', () => {
-          this.initSocket(this.globalOpts)
-        });
+        // this.socket.on('disconnect', () => {
+        //   this.initSocket(this.globalOpts)
+        // });
 
         this.socket.on('error', (res) => {
           console.warn('[ Liveevent:Socket ] Error: ' + res);

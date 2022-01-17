@@ -172,7 +172,7 @@ module ChatModule {
       if (!this.socket) {
         this.socket = Extension.io.connect(url, {forceNew: true});
       } else {
-        this.socket.io.connect()
+        this.socket.socket.connect()
       }
 
         this.socket.on('error', (res) => {
@@ -231,9 +231,9 @@ module ChatModule {
         });
 
         // On disconect
-        this.socket.on('disconnect', () => {
-          this.initSocket()
-        });
+        // this.socket.on('disconnect', () => {
+        //   this.initSocket()
+        // });
 
     }
 
