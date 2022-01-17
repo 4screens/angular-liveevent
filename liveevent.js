@@ -228,7 +228,7 @@ var Liveevent;
                 this.socket = Extension.io.connect(url, { forceNew: true });
             }
             else {
-                this.socket.io.connect(url, { forceNew: true });
+                this.socket.socket.connect();
             }
             this.socket.on('liveEventStatus', function (data) {
                 _this.liveStatusEventHandler(data, _this.globalOpts);
@@ -236,9 +236,9 @@ var Liveevent;
             this.socket.on('connect', function () {
                 _this.socket.emit('getStatus', { liveEventId: _this.globalOpts.id });
             });
-            this.socket.on('disconnect', function () {
-                _this.initSocket(_this.globalOpts);
-            });
+            // this.socket.on('disconnect', () => {
+            //   this.initSocket(this.globalOpts)
+            // });
             this.socket.on('error', function (res) {
                 console.warn('[ Liveevent:Socket ] Error: ' + res);
             });
@@ -467,7 +467,7 @@ var ChatModule;
                 this.socket = Extension.io.connect(url, { forceNew: true });
             }
             else {
-                this.socket.io.connect();
+                this.socket.socket.connect();
             }
             this.socket.on('error', function (res) {
                 console.warn(res);
@@ -517,9 +517,9 @@ var ChatModule;
                 });
             });
             // On disconect
-            this.socket.on('disconnect', function () {
-                _this.initSocket();
-            });
+            // this.socket.on('disconnect', () => {
+            //   this.initSocket()
+            // });
         };
         Chat.prototype.init = function () {
             var _this = this;
