@@ -272,7 +272,7 @@ var Liveevent;
                 }
             });
             // Active User Count listening
-            this.socket.on('activeUserCount', function (data) {
+            this.socket.on('respondentsCount', function (data) {
                 // Run callback
                 if (_this.globalOpts.callback.activeUserCount) {
                     _this.globalOpts.callback.activeUserCount(data);
@@ -643,7 +643,7 @@ var Page;
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 /*!
- * 4screens-angular-liveevent v0.2.13
+ * 4screens-angular-liveevent v0.2.14
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
