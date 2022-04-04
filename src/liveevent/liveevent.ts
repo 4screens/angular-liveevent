@@ -318,7 +318,7 @@ module Liveevent {
         });
 
         // Active User Count listening
-        this.socket.on('activeUserCount', (data) => {
+        this.socket.on('respondentsCount', (data) => {
           // Run callback
           if (this.globalOpts.callback.activeUserCount) {
             this.globalOpts.callback.activeUserCount(data);
