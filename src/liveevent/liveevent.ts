@@ -5,6 +5,10 @@ module Liveevent {
     questionId: string;
     avg: number;
   }
+  interface summaryResponseCountData {
+    questionId: string;
+    responseCount: number;
+  }
 
   export class Liveevent implements ILiveevent {
     enabled: boolean;
@@ -32,22 +36,24 @@ module Liveevent {
       this.event = new Util.Event();
     }
 
-    private summaryStatsUnification(data): summaryStatData {
+    private summaryStatsUnification(data): { result: summaryStatData, count?: summaryResponseCountData } {
       var result = <summaryStatData>{};
+      var count = <summaryResponseCountData>{};
 
       result.questionId = data._id;
 
       if (data.type === 'rateIt') {
         result.avg = data.stats.avg;
 
-        return result;
+        return { result };
       }
 
-      _.each(data.answers, function (answer: { percent: number, _id: string }) {
+      _.each(data.answers, function (answer: { percent: number, responseCount: number, _id: string }) {
         result[answer._id] = answer.percent;
+        count[answer._id] = answer.responseCount;
       });
 
-      return result;
+      return { result, count };
     };
 
     private getAnswersForSummary(): ng.IPromise<any> {
@@ -122,7 +128,7 @@ module Liveevent {
       if (Extension.mode === Engageform.Mode.Summary && this.currentEngageform.current
         && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
         this.getAnswersForSummary().then((answersData) => {
-          this.currentEngageform.current.updateAnswers(answersData);
+          this.currentEngageform.current.updateAnswers(answersData.result, answersData.count);
         });
 
         this.currentEngageform.liveSettings.showAnswers = true;
@@ -348,7 +354,6 @@ module Liveevent {
       url = url.replace(':questionId', questionId);
 
       return Extension.$http.get(url).then(function (res) {
-
         if ([200, 304].indexOf(res.status) !== -1) {
           return res.data;
         }
