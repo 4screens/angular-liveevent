@@ -31,15 +31,17 @@ var Liveevent;
         }
         Liveevent.prototype.summaryStatsUnification = function (data) {
             var result = {};
+            var count = {};
             result.questionId = data._id;
             if (data.type === 'rateIt') {
                 result.avg = data.stats.avg;
-                return result;
+                return { result: result };
             }
             _.each(data.answers, function (answer) {
                 result[answer._id] = answer.percent;
+                count[answer._id] = answer.responseCount;
             });
-            return result;
+            return { result: result, count: count };
         };
         ;
         Liveevent.prototype.getAnswersForSummary = function () {
@@ -107,7 +109,7 @@ var Liveevent;
             if (Extension.mode === Engageform.Mode.Summary && this.currentEngageform.current
                 && this.activePageId && _.has(Extension.config, 'engageform.presentationViewStats')) {
                 this.getAnswersForSummary().then(function (answersData) {
-                    _this.currentEngageform.current.updateAnswers(answersData);
+                    _this.currentEngageform.current.updateAnswers(answersData.result, answersData.count);
                 });
                 this.currentEngageform.liveSettings.showAnswers = true;
             }
@@ -643,7 +645,7 @@ var Page;
 /// <reference path="branding/ibranding.ts" />
 /// <reference path="navigation/inavigation.ts" /> 
 /*!
- * 4screens-angular-liveevent v0.2.23
+ * 4screens-angular-liveevent v0.2.24
  * (c) 2015 Nopattern sp. z o.o.
  * License: proprietary
  */
